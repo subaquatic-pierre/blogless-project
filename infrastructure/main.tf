@@ -21,17 +21,17 @@ provider "aws" {
   region = "us-east-1"
 }
 
-terraform {
-  backend "s3" {
-    bucket = "terraform-backend"
-    key    = "tfstate/terraform-backend"
-    region = "us-east-1"
-  }
-}
+# terraform {
+#   backend "s3" {
+#     bucket = "terraform-serverless-backend"
+#     key    = "tfstate/terraform-backend"
+#     region = "us-east-2"
+#   }
+# }
 
-module "api" {
-  source = "./api"
+# module "api" {
+#   source = "./api"
 
-}
+# }
 
 
