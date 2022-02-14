@@ -5,3 +5,9 @@ output "lambda_bucket_name" {
 
   value = module.lambda.lambda_bucket_name
 }
+
+output "function_name" {
+  description = "Name of the Lambda function."
+
+  value = module.lambda.function_name
+}
