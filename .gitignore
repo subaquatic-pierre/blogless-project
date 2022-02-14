@@ -2,3 +2,4 @@ frontend/node_modules
 
 infrastructure/.terraform
 infrastructure/*.tfvars
+infrastructure/lambda/functions.zip
