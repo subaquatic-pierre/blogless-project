@@ -29,6 +29,10 @@ provider "aws" {
 #   }
 # }
 
+module "lambda" {
+  source = "./lambda"
+}
+
 # module "pipeline" {
 #   source = "./pipeline"
 
@@ -39,10 +43,7 @@ provider "aws" {
 
 # }
 
-module "lambda" {
-  source = "./lambda"
 
-}
 
 # module "api" {
 #   source = "./api"
