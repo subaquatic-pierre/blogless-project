@@ -1,4 +1,5 @@
 frontend/node_modules
+.venv
 
 infrastructure/.terraform
 infrastructure/*.tfvars

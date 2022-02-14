@@ -14,6 +14,7 @@ def handler(event, context):
 
     s3 = boto3.resource("s3")
     bucket = s3.Bucket("serverless-blog-contents")
+    object_summary_iterator = bucket.objects.all()
 
-    response = {"result": "this is the reponse"}
+    response = {"result": list(object_summary_iterator)}
     return response

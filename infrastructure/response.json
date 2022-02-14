@@ -1,0 +1,3 @@
+{
+    "result": ["Acl", "Cors", "Lifecycle", "LifecycleConfiguration", "Logging", "Notification", "Object", "Policy", "RequestPayment", "Tagging", "Versioning", "Website"]
+}
