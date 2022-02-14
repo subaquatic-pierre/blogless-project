@@ -29,6 +29,21 @@ provider "aws" {
 #   }
 # }
 
+# module "pipeline" {
+#   source = "./pipeline"
+
+# }
+
+# module "frontend" {
+#   source = "./frontend"
+
+# }
+
+module "lambda" {
+  source = "./lambda"
+
+}
+
 # module "api" {
 #   source = "./api"
 
