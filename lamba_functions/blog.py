@@ -22,16 +22,22 @@ class BlogDirectory(Directory):
         super().__init__(BUCKET, BLOG_BASE_KEY)
 
     def list_dir(self):
-        # partial_list_res = s3_client.list_objects_v2(Bucket=self.bucket, Key=self.key)
-        print(self.key)
-        dir_list = []
+        partial_list_res = s3_client.list_objects_v2(
+            Bucket=self.bucket, Prefix=self.key
+        )
+        dir_list = set()
 
-        # for object in partial_list_res["Contents"]:
-        #     object_key = object["Key"]
-        #     if len(object_key.split("/")) == 2:
-        #         dir_list.append(object["Key"])
+        for object in partial_list_res["Contents"]:
+            object_key = object["Key"]
+            split_contents = object_key.split("/")
+            base_dir = split_contents[0]
+            directory = split_contents[1]
 
-        return dir_list
+            if directory != "" and directory != "index.json":
+                key = f"{base_dir}/{directory}"
+                dir_list.add(key)
+
+        return list(item for item in dir_list)
 
     def list_index(self):
         index_response = s3_client.get_object(
