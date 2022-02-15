@@ -36,7 +36,7 @@ s3.put_object(Bucket=BUCKET, Key=f"{new_dir_key}/meta.json", Body=json.dumps(met
 
 # upload contents
 s3.put_object(
-    Bucket=BUCKET, Key=f"{new_dir_key}/contents.json", Body=json.dumps(content)
+    Bucket=BUCKET, Key=f"{new_dir_key}/content.json", Body=json.dumps(content)
 )
 
 # upload images
