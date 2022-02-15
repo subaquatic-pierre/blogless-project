@@ -14,13 +14,16 @@ index: list = json.loads(index_response["Body"].read())
 
 
 # Define new blog data
-new_blog_id = index.length
+new_blog_id = len(index)
 blog_name = generate_name(style="capital")
 
-new_dir_key = f'{BLOG_BASE_KEY}/{new_blog_id}-{blog_name.lower().replace(" ", "-")}/'
+new_dir_key = f'{BLOG_BASE_KEY}/{new_blog_id}-{blog_name.lower().replace(" ", "-")}'
 time_stamp = int(time.time())
 
-contents = json.loads("./blog_template/contents.json")
+file = open("blog_template/content.json")
+content = json.loads(file.read())
+file.close()
+
 meta_data = {
     "id": new_blog_id,
     "time_stamp": time_stamp,
@@ -28,21 +31,19 @@ meta_data = {
     "dir_key": new_dir_key,
 }
 
-# Create blog dir
-s3.put_object(Bucket=BUCKET, Key=new_dir_key)
-
 # upload meta data
-s3.put_object(Bucket=BUCKET, Key=f'{new_dir_key}/meta.json',Body=json.dumps(meta_data))
+s3.put_object(Bucket=BUCKET, Key=f"{new_dir_key}/meta.json", Body=json.dumps(meta_data))
 
 # upload contents
-s3.put_object(Bucket=BUCKET, Key=)
+s3.put_object(
+    Bucket=BUCKET, Key=f"{new_dir_key}/contents.json", Body=json.dumps(content)
+)
 
 # upload images
-s3.put_object(Bucket=BUCKET, Key=)
+s3.put_object(Bucket=BUCKET, Key=f"{new_dir_key}/images/")
 
 
+index.append(meta_data)
 
-index.push(meta_data)
-
-print(index)
-print(contents)
+# update index
+s3.put_object(Bucket=BUCKET, Key=f"{BLOG_BASE_KEY}/index.json", Body=json.dumps(index))
