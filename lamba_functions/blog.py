@@ -34,7 +34,7 @@ class BlogDirectory(Directory):
             directory = split_contents[1]
 
             if directory != "" and directory != "index.json":
-                key = f"{base_dir}/{directory}"
+                key = f"{base_dir}/{directory}/"
                 dir_list.add(key)
 
         return list(item for item in dir_list)
