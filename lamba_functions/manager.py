@@ -6,20 +6,21 @@ import boto3
 
 s3 = boto3.resource("s3")
 
+
 class PostMetaData:
-    def __init__(self, post_id, title, dir_key) -> None:
+    def __init__(self, post_id, title, dir_key, time_stamp) -> None:
         self.id = post_id
         self.title = title
         self.dir_key = dir_key
+        self.time_stamp = time_stamp
 
 
 class Post:
-    def __init__(self, title, post_id, bucket_proxy, meta_data) -> None:
-        self.title = title
-        self.id = post_id
+    def __init__(self, meta_data, bucket_proxy) -> None:
+        self.id = meta_data.id
+        self.title = meta_data.title
         self.bucket_proxy = bucket_proxy
         self.meta_data = meta_data
-
 
 
 class BucketProxy:
@@ -46,7 +47,5 @@ class PostManager:
         obj_json = self.bucket_proxy.get_json_data("index.json")
         return obj_json
 
-    
-
-    def get_post_by_id(self,id):
-
+    def get_post_by_id(self, id):
+        pass
