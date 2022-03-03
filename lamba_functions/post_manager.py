@@ -18,3 +18,7 @@ class PostManager:
 
     def title_to_id(self, title: str) -> int:
         titles = [title for blog_meta in self.index]
+
+    def list_all(self) -> dict:
+        all_posts = self.bucket_proxy.get_json_data("index.json")
+        return all_posts
