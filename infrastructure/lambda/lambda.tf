@@ -1,4 +1,4 @@
-resource "aws_lambda_function" "list_bucket_contents" {
+resource "aws_lambda_function" "list_bucket_content" {
   function_name = "ListBucketContents"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
@@ -42,7 +42,7 @@ resource "aws_iam_policy" "bucket_policy" {
         Sid    = "ListObjectsInBucket",
         Effect = "Allow"
         Resource = [
-          "arn:aws:s3:::${aws_s3_bucket.blog_contents.id}",
+          "arn:aws:s3:::${aws_s3_bucket.blog_content.id}",
           "arn:aws:s3:::${aws_s3_bucket.lambda_bucket.id}"
         ]
       },
@@ -53,7 +53,7 @@ resource "aws_iam_policy" "bucket_policy" {
         Sid    = "AllObjectActions",
         Effect = "Allow"
         Resource = [
-          "arn:aws:s3:::${aws_s3_bucket.blog_contents.id}",
+          "arn:aws:s3:::${aws_s3_bucket.blog_content.id}",
           "arn:aws:s3:::${aws_s3_bucket.lambda_bucket.id}"
         ]
       },

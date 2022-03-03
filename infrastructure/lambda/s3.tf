@@ -9,7 +9,7 @@ resource "aws_s3_bucket_acl" "lambda_bucket" {
 }
 
 
-resource "aws_s3_bucket" "blog_contents" {
+resource "aws_s3_bucket" "blog_content" {
   bucket        = "serverless-blog-contents"
   force_destroy = true
 }

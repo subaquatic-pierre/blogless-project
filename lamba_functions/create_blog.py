@@ -1,5 +1,6 @@
 import json
 import time
+
 from names_generator import generate_name
 import boto3
 
@@ -17,7 +18,7 @@ index: list = json.loads(index_response["Body"].read())
 new_blog_id = len(index)
 blog_title = generate_name(style="capital")
 
-new_dir_key = f'{BLOG_BASE_KEY}{new_blog_id}-{blog_title.lower().replace(" ", "-")}/'
+new_dir_key = f"{BLOG_BASE_KEY}{new_blog_id}/"
 time_stamp = int(time.time())
 
 file = open("blog_template/content.json")
@@ -28,7 +29,6 @@ meta_data = {
     "id": new_blog_id,
     "time_stamp": time_stamp,
     "title": blog_title,
-    "dir_key": new_dir_key,
 }
 
 # upload meta data

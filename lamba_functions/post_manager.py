@@ -1,4 +1,5 @@
 from abc import ABC
+from post import Post
 from bucket_proxy import BucketProxy
 
 
