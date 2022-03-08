@@ -28,7 +28,7 @@ class PostManager:
     def title_to_id(self, title: str) -> int:
         meta = [blog_meta for blog_meta in self.index if blog_meta["title"] == title]
         self._verify_meta(meta)
-        return meta
+        return meta[0]["id"]
 
     def list_all(self) -> dict:
         all_posts = self.bucket_proxy.get_json("index.json")

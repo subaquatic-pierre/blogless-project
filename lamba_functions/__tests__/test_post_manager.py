@@ -15,6 +15,9 @@ class BucketTestProxy(BaseBucketProxy):
         file.close()
         return content
 
+    def save_json(self):
+        pass
+
 
 class TestPostManager(TestCase):
     def setUp(self) -> None:
@@ -25,3 +28,13 @@ class TestPostManager(TestCase):
     def test_list_all(self):
         all_posts = self.blog_manager.list_all()
         self.assertNotEqual(all_posts, 0, "No posts returned from index call")
+
+    def test_title_to_id_success(self):
+        post_id = self.blog_manager.title_to_id("Nervous Poincare")
+        self.assertIsInstance(post_id, int)
+
+    def test_title_to_id_not_found(self):
+        with self.assertRaises(Exception) as context:
+            self.blog_manager.title_to_id("Nervous")
+
+        self.assertTrue("No blog with that title found" in str(context.exception))
