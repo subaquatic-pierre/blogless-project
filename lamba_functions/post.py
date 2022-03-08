@@ -1,13 +1,16 @@
-from abc import ABC
+import os
 from bucket_proxy import BucketProxy
 from post_meta import PostMetaData
 
 
 class Post:
-    def __init__(self, meta_data: PostMetaData, bucket_proxy: BucketProxy) -> None:
+    def __init__(
+        self, meta_data: PostMetaData, bucket_proxy: BucketProxy, content
+    ) -> None:
         self.id = meta_data.id
         self.bucket_proxy = bucket_proxy
         self.meta_data = meta_data
+        self.content = content
 
     @property
     def title(self):
@@ -16,6 +19,20 @@ class Post:
     @property
     def content(self):
         content = self.bucket_proxy.get_json("content.json")
+        return content
+
+    def save(self):
+        # Save content
+        self.bucket_proxy.save_json(self.content, "content.json")
+        # Save meta
+        self.bucket_proxy.save_json(self.meta_data, "meta.json")
+
+        # Save images, for image in images
+        cwd = os.path.basename(os.path.dirname(__file__))
+        file = open(f"{cwd}/blog_template/0/images/template.jpg")
+        image = file.read()
+        file.close()
+        self.bucket_proxy.save_file(image, "images/template.jpg")
 
     def __str__(self):
         return f"ID: {self.id}, Title: {self.meta_data.title}"

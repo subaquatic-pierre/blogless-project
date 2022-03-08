@@ -4,3 +4,5 @@ frontend/node_modules
 infrastructure/.terraform
 infrastructure/*.tfvars
 infrastructure/lambda/functions.zip
+
+lambda_functions/blog_template/

@@ -1,4 +1,4 @@
-from abc import ABC
+from time import time
 from post_meta import PostMetaData
 from post import Post
 from bucket_proxy import BucketProxy
@@ -33,6 +33,26 @@ class PostManager:
     def list_all(self) -> dict:
         all_posts = self.bucket_proxy.get_json("index.json")
         return all_posts
+
+    def create_post(self, title, content):
+        new_id = self._get_latest_id()
+        timestamp = int(time.now())
+
+        meta_data = {
+            "id": new_id,
+            "timestamp": timestamp,
+            "title": title,
+        }
+
+        bucket_proxy = BucketProxy(
+            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}"
+        )
+        meta = PostMetaData(new_id, title, timestamp)
+        post = Post(meta, bucket_proxy, content)
+        post.save()
+
+    def _get_latest_id(self):
+        return len(self.index)
 
     def _verify_meta(self, meta):
         if len(meta) > 1:

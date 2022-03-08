@@ -15,7 +15,7 @@ class BucketTestProxy(BaseBucketProxy):
         file.close()
         return content
 
-    def save_json(self):
+    def save_json(self, filename):
         pass
 
 
@@ -38,3 +38,26 @@ class TestPostManager(TestCase):
             self.blog_manager.title_to_id("Nervous")
 
         self.assertTrue("No blog with that title found" in str(context.exception))
+
+    def test_create_post(self):
+        index = [
+            {"id": 0, "time_stamp": 1646289628, "title": "Nervous Poincare"},
+            {"id": 1, "time_stamp": 1646289718, "title": "Recursing Hypatia"},
+        ]
+        content = {
+            "time": 1550476186479,
+            "blocks": [
+                {
+                    "type": "paragraph",
+                    "data": {
+                        "text": "The example of text that was written in <b>one of popular</b> text editors."
+                    },
+                },
+                {
+                    "type": "header",
+                    "data": {"text": "With the header of course", "level": 2},
+                },
+                {"type": "paragraph", "data": {"text": "So what do we have?"}},
+            ],
+            "version": "2.8.1",
+        }

@@ -26,5 +26,17 @@ class BucketProxy(BaseBucketProxy):
         object_json = json.loads(object_res["Body"].read())
         return object_json
 
-    def save_json(self):
-        pass
+    def save_json(self, body: dict, filename: str):
+        s3.put_object(Bucket=self.bucket_name, Key=self.root_dir)
+        s3.put_object(
+            Bucket=self.bucket_name,
+            Key=f"{self.root_dir}{filename}",
+            Body=json.dumps(body),
+        )
+
+    def save_file(self, body: bytes, filename: str):
+        s3.put_object(
+            Bucket=self.bucket_name,
+            Key=f"{self.root_dir}{filename}",
+            Body=bytes,
+        )
