@@ -22,7 +22,8 @@ class PostManager:
             self.bucket_proxy.bucket_name, post_dir_bucket_key
         )
         post_meta = PostMetaData(id, meta[0]["title"], meta[0]["time_stamp"])
-        post = Post(post_meta, post_bucket_proxy)
+        content = self.bucket_proxy.get_json(f"{post_dir_bucket_key}/content.json")
+        post = Post(post_meta, post_bucket_proxy, content)
         return post
 
     def title_to_id(self, title: str) -> int:
@@ -34,22 +35,18 @@ class PostManager:
         all_posts = self.bucket_proxy.get_json("index.json")
         return all_posts
 
-    def create_post(self, title, content):
+    def create_post(self, title, content, image=None):
         new_id = self._get_latest_id()
-        timestamp = int(time.now())
-
-        meta_data = {
-            "id": new_id,
-            "timestamp": timestamp,
-            "title": title,
-        }
+        timestamp = int(time())
 
         bucket_proxy = BucketProxy(
-            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}"
+            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}/"
         )
         meta = PostMetaData(new_id, title, timestamp)
-        post = Post(meta, bucket_proxy, content)
+        post = Post(meta, bucket_proxy, content, image)
         post.save()
+
+        return post
 
     def _get_latest_id(self):
         return len(self.index)

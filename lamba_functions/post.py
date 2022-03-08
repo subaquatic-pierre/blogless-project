@@ -5,12 +5,13 @@ from post_meta import PostMetaData
 
 class Post:
     def __init__(
-        self, meta_data: PostMetaData, bucket_proxy: BucketProxy, content
+        self, meta_data: PostMetaData, bucket_proxy: BucketProxy, content, image=None
     ) -> None:
         self.id = meta_data.id
         self.bucket_proxy = bucket_proxy
         self.meta_data = meta_data
-        self.content = content
+        self._content = content
+        self.image = image
 
     @property
     def title(self):
@@ -23,16 +24,13 @@ class Post:
 
     def save(self):
         # Save content
-        self.bucket_proxy.save_json(self.content, "content.json")
+        self.bucket_proxy.save_json(self._content, "content.json")
         # Save meta
-        self.bucket_proxy.save_json(self.meta_data, "meta.json")
+        self.bucket_proxy.save_json(self.meta_data.to_json(), "meta.json")
 
         # Save images, for image in images
-        cwd = os.path.basename(os.path.dirname(__file__))
-        file = open(f"{cwd}/blog_template/0/images/template.jpg")
-        image = file.read()
-        file.close()
-        self.bucket_proxy.save_file(image, "images/template.jpg")
+        if self.image != None:
+            self.bucket_proxy.save_file(self.image, f"images/template.jpg")
 
     def __str__(self):
         return f"ID: {self.id}, Title: {self.meta_data.title}"
