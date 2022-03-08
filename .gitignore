@@ -1,6 +1,6 @@
 frontend/node_modules
 .venv
-
+**/__pycache__/
 infrastructure/.terraform
 infrastructure/*.tfvars
 infrastructure/lambda/functions.zip
