@@ -11,13 +11,20 @@ class BaseBucketProxy(ABC):
         self.root_dir = root_dir
 
     @abstractmethod
-    def get_json_data(self, filename):
+    def get_json(self, filename):
+        pass
+
+    @abstractmethod
+    def save_json(self, filename):
         pass
 
 
 class BucketProxy(BaseBucketProxy):
-    def get_json_data(self, object_key):
+    def get_json(self, object_key):
         object = s3.Object(self.bucket_name, f"{self.root_dir}{object_key}")
         object_res = object.get()
         object_json = json.loads(object_res["Body"].read())
         return object_json
+
+    def save_json(self):
+        pass

@@ -8,7 +8,7 @@ from bucket_proxy import BaseBucketProxy
 
 
 class BucketTestProxy(BaseBucketProxy):
-    def get_json_data(self, filename):
+    def get_json(self, filename):
         cwd = os.path.basename(os.path.dirname(__file__))
         file = open(f"{cwd}/fixtures/blog/{filename}")
         content = json.loads(file.read())
