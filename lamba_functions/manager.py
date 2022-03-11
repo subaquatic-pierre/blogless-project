@@ -1,7 +1,6 @@
-from time import time
-from post_meta import PostMetaData
+from meta import PostMetaData
 from post import Post
-from bucket_proxy import BucketProxy
+from proxy import BucketProxy
 
 
 class PostManager:
@@ -50,10 +49,21 @@ class PostManager:
         # Update index and save post
         try:
             index = self.index
-            index.append(post.meta_data.to_json())
-            self._update_index(index)
 
+            meta_index = None
+            for i in range(len(index)):
+                if index[i]["id"] == post.id:
+                    meta_index = i
+
+            if meta_index != None:
+                index[i] = post.meta_data.to_json()
+
+            else:
+                index.append(post.meta_data.to_json())
+
+            self._update_index(index)
             post.save()
+
             return post
 
         except Exception:

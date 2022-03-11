@@ -1,6 +1,6 @@
 import json
-from bucket_proxy import BucketProxy
-from post_meta import PostMetaData
+from proxy import BucketProxy
+from meta import PostMetaData
 
 
 class Post:
@@ -16,6 +16,10 @@ class Post:
     @property
     def title(self):
         return self.meta_data.title
+
+    @title.setter
+    def title(self, title):
+        self.meta_data.title = title
 
     @property
     def content(self):
@@ -39,6 +43,9 @@ class Post:
 
     def list_files(self):
         return self.bucket_proxy.list_dir()
+
+    def to_json(self):
+        return self.meta_data.to_json()
 
     def _base_image_url(self):
         return f"https://{self.bucket_proxy.bucket_name}.s3.amazonaws.com/"

@@ -3,8 +3,8 @@ import os
 import json
 from unittest.mock import MagicMock
 
-from post_manager import PostManager
-from bucket_proxy import BaseBucketProxy
+from lamba_functions.manager import PostManager
+from lamba_functions.proxy import BaseBucketProxy
 
 
 class BucketTestProxy(BaseBucketProxy):
