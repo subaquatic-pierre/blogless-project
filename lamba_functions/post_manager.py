@@ -18,6 +18,9 @@ class PostManager:
     def list_all_files(self):
         return self.bucket_proxy.list_dir()
 
+    def get_latest_id(self):
+        return len(self.index)
+
     def get_json(self, filename):
         return self.bucket_proxy.get_json(filename)
 
@@ -43,28 +46,34 @@ class PostManager:
         all_posts = self.bucket_proxy.get_json("index.json")
         return all_posts
 
-    def create_post(self, title, content, image=None):
-        new_id = self._get_latest_id()
-        timestamp = int(time())
+    def save_post(self, post: Post):
+        # Update index and save post
+        try:
+            index = self.index
+            index.append(post.meta_data.to_json())
+            self._update_index(index)
 
-        bucket_proxy = BucketProxy(
-            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}/"
-        )
-        meta = PostMetaData(new_id, title, timestamp)
-        post = Post(meta, bucket_proxy, content, image)
-        post.save()
+            post.save()
+            return post
 
+        except Exception:
+            raise Exception("Post could not be saved")
+
+    def delete_post(self, id: int):
+        post = self.get_by_id(id)
+        post_files = post.list_files()
+
+        # Add root dir to filenames
+        post_files.append(post.bucket_proxy.root_dir)
+        self.bucket_proxy.delete_files(post_files)
+
+        # Update index
         index = self.index
-        index.append(meta.to_json())
-        self._update_index(index)
+        new_index = [meta for meta in index if meta["id"] != id]
+        self._update_index(new_index)
 
-        return post
-
-    def _update_index(self, new_index):
+    def _update_index(self, new_index: list):
         self.bucket_proxy.save_json(new_index, "index.json")
-
-    def _get_latest_id(self):
-        return len(self.index)
 
     def _init_bucket(self):
         try:

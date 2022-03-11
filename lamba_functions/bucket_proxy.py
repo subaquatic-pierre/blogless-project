@@ -34,6 +34,11 @@ class BucketProxy(BaseBucketProxy):
             Body=json.dumps(body),
         )
 
+    def delete_files(self, filenames):
+        if len(filenames) > 0:
+            objects = [{"Key": filename} for filename in filenames]
+            self.bucket_interface.delete_objects(Delete={"Objects": objects})
+
     def list_dir(self, dir: str = ""):
         object_summary_iterator = self.bucket_interface.objects.all()
         object_keys = [
