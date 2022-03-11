@@ -36,7 +36,12 @@ class BucketProxy(BaseBucketProxy):
 
     def list_dir(self, dir: str = ""):
         object_summary_iterator = self.bucket_interface.objects.all()
-        object_keys = [obj.key for obj in object_summary_iterator]
+        object_keys = [
+            obj.key
+            for obj in object_summary_iterator
+            if obj.key.startswith(f"{self.root_dir}{dir}")
+            and obj.key != f"{self.root_dir}{dir}"
+        ]
         return object_keys
 
     def save_bytes(self, body: bytes, filename: str):

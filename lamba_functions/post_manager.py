@@ -8,6 +8,7 @@ class PostManager:
     def __init__(self, template_name: str, bucket_proxy: BucketProxy) -> None:
         self.bucket_proxy = bucket_proxy
         self.template_name = template_name
+        self._init_bucket()
 
     @property
     def index(self):
@@ -27,7 +28,9 @@ class PostManager:
         post_bucket_proxy = BucketProxy(
             self.bucket_proxy.bucket_name, post_dir_bucket_key
         )
-        post_meta = PostMetaData(id, meta[0]["title"], meta[0]["time_stamp"])
+        post_meta = PostMetaData(
+            id, meta[0]["title"], meta[0]["timestamp"], self.template_name
+        )
         post = Post(post_meta, post_bucket_proxy)
         return post
 
@@ -51,10 +54,24 @@ class PostManager:
         post = Post(meta, bucket_proxy, content, image)
         post.save()
 
+        index = self.index
+        index.append(meta.to_json())
+        self._update_index(index)
+
         return post
+
+    def _update_index(self, new_index):
+        self.bucket_proxy.save_json(new_index, "index.json")
 
     def _get_latest_id(self):
         return len(self.index)
+
+    def _init_bucket(self):
+        try:
+            self.bucket_proxy.get_json("index.json")
+
+        except Exception:
+            self.bucket_proxy.save_json([], "index.json")
 
     def _verify_meta(self, meta):
         if len(meta) > 1:
