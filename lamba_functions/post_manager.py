@@ -14,6 +14,12 @@ class PostManager:
         obj_json = self.bucket_proxy.get_json("index.json")
         return obj_json
 
+    def list_all_files(self):
+        return self.bucket_proxy.list_dir()
+
+    def get_json(self, filename):
+        return self.bucket_proxy.get_json(filename)
+
     def get_by_id(self, id) -> Post:
         meta = [meta_data for meta_data in self.index if meta_data["id"] == id]
         self._verify_meta(meta)
@@ -22,8 +28,7 @@ class PostManager:
             self.bucket_proxy.bucket_name, post_dir_bucket_key
         )
         post_meta = PostMetaData(id, meta[0]["title"], meta[0]["time_stamp"])
-        content = self.bucket_proxy.get_json(f"{post_dir_bucket_key}/content.json")
-        post = Post(post_meta, post_bucket_proxy, content)
+        post = Post(post_meta, post_bucket_proxy)
         return post
 
     def title_to_id(self, title: str) -> int:

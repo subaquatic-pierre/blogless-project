@@ -9,6 +9,7 @@ class BaseBucketProxy(ABC):
     def __init__(self, bucket_name, root_dir) -> None:
         self.bucket_name = bucket_name
         self.root_dir = root_dir
+        self.bucket_interface = s3.Bucket(bucket_name)
 
     @abstractmethod
     def get_json(self, filename):
@@ -27,16 +28,19 @@ class BucketProxy(BaseBucketProxy):
         return object_json
 
     def save_json(self, body: dict, filename: str):
-        bucket = s3.Bucket(self.bucket_name)
-        bucket.put_object(Key=self.root_dir)
-        bucket.put_object(
+        self.bucket_interface.put_object(Key=self.root_dir)
+        self.bucket_interface.put_object(
             Key=f"{self.root_dir}{filename}",
             Body=json.dumps(body),
         )
 
-    def save_file(self, body: bytes, filename: str):
-        bucket = s3.Bucket(self.bucket_name)
-        bucket.put_object(
+    def list_dir(self, dir: str = ""):
+        object_summary_iterator = self.bucket_interface.objects.all()
+        object_keys = [obj.key for obj in object_summary_iterator]
+        return object_keys
+
+    def save_bytes(self, body: bytes, filename: str):
+        self.bucket_interface.put_object(
             Key=f"{self.root_dir}{filename}",
             Body=body,
         )

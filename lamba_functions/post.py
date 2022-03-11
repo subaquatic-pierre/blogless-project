@@ -5,7 +5,7 @@ from post_meta import PostMetaData
 
 class Post:
     def __init__(
-        self, meta_data: PostMetaData, bucket_proxy: BucketProxy, content, image=None
+        self, meta_data: PostMetaData, bucket_proxy: BucketProxy, content="", image=None
     ) -> None:
         self.id = meta_data.id
         self.bucket_proxy = bucket_proxy
@@ -19,8 +19,8 @@ class Post:
 
     @property
     def content(self):
-        content = self.bucket_proxy.get_json("content.json")
-        return content
+        self._content = self.bucket_proxy.get_json("content.json")
+        return self._content
 
     def save(self):
         # Save content
@@ -31,6 +31,9 @@ class Post:
         # Save images, for image in images
         if self.image != None:
             self.bucket_proxy.save_file(self.image, f"images/template.jpg")
+
+    def image_urls(self):
+        return self.bucket_proxy.list_dir("images/")
 
     def __str__(self):
         return f"ID: {self.id}, Title: {self.meta_data.title}"

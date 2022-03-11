@@ -16,14 +16,24 @@ post_manager = PostManager("Blog", bucket_proxy)
 # print(post.content)
 
 # Create test post
-cwd = os.getcwd()
-print(cwd)
-file = open(f"{cwd}/blog_template/0/content.json")
-content = json.loads(file.read())
-file.close()
+# cwd = os.getcwd()
+# print(cwd)
+# file = open(f"{cwd}/blog_template/0/content.json")
+# content = json.loads(file.read())
+# file.close()
 
-image_file = open(f"{cwd}/blog_template/0/images/template.jpg", "rb")
-image = image_file.read()
-image_file.close()
+# image_file = open(f"{cwd}/blog_template/0/images/template.jpg", "rb")
+# image = image_file.read()
+# image_file.close()
 
-new_post = post_manager.create_post("New Amazing Blog", content, image)
+# new_post = post_manager.create_post("New Amazing Blog", content, image)
+
+# print(post_manager.index)
+# files = post_manager.list_all_files()
+# print(files)
+
+# List all items in post bucket
+post = post_manager.get_by_id(0)
+print(post)
+# items = post.image_urls()
+# print(items)
