@@ -1,8 +1,13 @@
-frontend/node_modules
-.venv
+**/node_modules/
+**/.venv/
 **/__pycache__/
+
+# Infrastrcutre ignore
 infrastructure/.terraform
 infrastructure/*.tfvars
 infrastructure/lambda/functions.zip
+infrastructure/variables.tf
+infrastructure/terraform.tfvars
 
 lambda_functions/blog_template/
+

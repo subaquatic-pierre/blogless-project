@@ -37,15 +37,20 @@ module "content" {
   source = "./content"
 }
 
+module "frontend" {
+  source       = "./frontend"
+  tags         = var.tags
+  ssl_cert_arn = var.ssl_cert_arn
+  domain_name  = var.domain_name
+
+}
+
 # module "pipeline" {
 #   source = "./pipeline"
 
 # }
 
-# module "frontend" {
-#   source = "./frontend"
 
-# }
 
 
 
