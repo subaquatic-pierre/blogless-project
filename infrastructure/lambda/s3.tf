@@ -9,11 +9,6 @@ resource "aws_s3_bucket_acl" "lambda_bucket" {
 }
 
 
-resource "aws_s3_bucket" "blog_content" {
-  bucket        = "serverless-blog-contents"
-  force_destroy = true
-}
-
 data "archive_file" "lambda_functions" {
   type = "zip"
 

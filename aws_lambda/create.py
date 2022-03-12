@@ -4,10 +4,10 @@ from names_generator import generate_name
 import json
 
 
-from manager import PostManager
-from meta import PostMetaData
-from proxy import BucketProxy
-from post import Post
+from postmanager.manager import PostManager
+from postmanager.meta import PostMetaData
+from postmanager.proxy import BucketProxy
+from postmanager.post import Post
 
 bucket_proxy = BucketProxy("serverless-blog-contents", "blog/")
 post_manager = PostManager("Blog", bucket_proxy)
@@ -31,11 +31,11 @@ def create_post(title, content, image):
 
 def get_dummy_data():
     cwd = os.getcwd()
-    file = open(f"{cwd}/blog_template/0/content.json")
+    file = open(f"{cwd}/lambda_f/blog_template/0/content.json")
     content = json.loads(file.read())
     file.close()
 
-    image_file = open(f"{cwd}/blog_template/0/images/template.jpg", "rb")
+    image_file = open(f"{cwd}/lambda_f/blog_template/0/images/template.jpg", "rb")
     image = image_file.read()
     image_file.close()
 

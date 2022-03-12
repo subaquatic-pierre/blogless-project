@@ -1,6 +1,6 @@
 import json
-from proxy import BucketProxy
-from meta import PostMetaData
+from postmanager.proxy import BucketProxy
+from postmanager.meta import PostMetaData
 
 
 class Post:
@@ -25,6 +25,10 @@ class Post:
     def content(self):
         self._content = self.bucket_proxy.get_json("content.json")
         return self._content
+
+    @content.setter
+    def content(self, content):
+        self._content = content
 
     def save(self):
         # Save content

@@ -1,6 +1,6 @@
-from meta import PostMetaData
-from post import Post
-from proxy import BucketProxy
+from postmanager.meta import PostMetaData
+from postmanager.post import Post
+from postmanager.proxy import BucketProxy
 
 
 class PostManager:

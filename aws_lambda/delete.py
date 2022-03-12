@@ -1,5 +1,5 @@
-from manager import PostManager
-from proxy import BucketProxy
+from postmanager.manager import PostManager
+from postmanager.proxy import BucketProxy
 
 
 bucket_proxy = BucketProxy("serverless-blog-contents", "blog/")

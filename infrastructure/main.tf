@@ -33,6 +33,10 @@ module "lambda" {
   source = "./lambda"
 }
 
+module "content" {
+  source = "./content"
+}
+
 # module "pipeline" {
 #   source = "./pipeline"
 
