@@ -1,96 +1,39 @@
-resource "aws_cloudfront_origin_access_identity" "main" {
+resource "aws_cloudfront_origin_access_identity" "frontend_main" {
   comment = "Frontend cloudfront identity access for ${var.tags["Name"]}"
 }
 
-resource "aws_cloudfront_distribution" "main" {
-  aliases             = [var.domain_name]
-  default_root_object = "index.html"
-  enabled             = true
-  comment             = "Frontend CDN for ${var.tags["Name"]}"
-
-  origin {
-    domain_name = aws_s3_bucket.main.bucket_regional_domain_name
-    origin_id   = "S3-${var.domain_name}"
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.main.cloudfront_access_identity_path
-    }
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    acm_certificate_arn      = var.ssl_cert_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2018"
-  }
-
-  default_cache_behavior {
-    allowed_methods = ["GET", "HEAD"]
-    cached_methods  = ["GET", "HEAD"]
-
-    min_ttl     = 0
-    default_ttl = 3600
-    max_ttl     = 86400
-
-    viewer_protocol_policy = "redirect-to-https"
-    target_origin_id       = "S3-${var.domain_name}"
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-  }
-
-  tags = var.tags
+locals {
+  s3_origin_id = "s3frontendOrigin"
 }
 
-resource "aws_cloudfront_distribution" "www" {
-  aliases = ["www.${var.domain_name}"]
-  enabled = true
-  comment = "Redirect CDN for frontend ${var.domain_name}"
 
+resource "aws_cloudfront_distribution" "frontend_main" {
   origin {
-    domain_name = aws_s3_bucket.www.website_endpoint
-    origin_id   = "S3-www.${var.domain_name}"
+    domain_name = aws_s3_bucket.frontend_main.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
 
-    custom_origin_config {
-      http_port              = "80"
-      https_port             = "443"
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
     }
   }
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  logging_config {
+    include_cookies = false
+    bucket          = "mylogs.s3.amazonaws.com"
+    prefix          = "myprefix"
   }
 
-  viewer_certificate {
-    acm_certificate_arn      = var.ssl_cert_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2018"
-  }
+  aliases = ["${var.domain_name}", "www.${var.domain_name}"]
 
   default_cache_behavior {
-    allowed_methods = ["GET", "HEAD"]
-    cached_methods  = ["GET", "HEAD"]
-
-    min_ttl     = 0
-    default_ttl = 3600
-    max_ttl     = 86400
-
-    viewer_protocol_policy = "redirect-to-https"
-    target_origin_id       = "S3-www.${var.domain_name}"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
 
     forwarded_values {
       query_string = false
@@ -99,7 +42,129 @@ resource "aws_cloudfront_distribution" "www" {
         forward = "none"
       }
     }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
   }
 
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+
+  # price_class = "PriceClass_200"
+
   tags = var.tags
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+}
+
+resource "aws_cloudfront_distribution" "frontend_redirect" {
+  origin {
+    domain_name = aws_s3_bucket.frontend_main.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  logging_config {
+    include_cookies = false
+    bucket          = "mylogs.s3.amazonaws.com"
+    prefix          = "myprefix"
+  }
+
+  aliases = ["www.${var.domain_name}"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+
+  # price_class = "PriceClass_200"
+
+  tags = var.tags
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
 }
