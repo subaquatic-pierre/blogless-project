@@ -8,6 +8,7 @@ infrastructure/*.tfvars
 infrastructure/lambda/functions.zip
 infrastructure/variables.tf
 infrastructure/terraform.tfvars
+infrastructure/plan
 
 lambda_functions/blog_template/
 
