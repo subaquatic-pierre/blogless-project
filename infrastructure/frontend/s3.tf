@@ -26,23 +26,23 @@ resource "aws_s3_bucket_acl" "main" {
 # S3 bucket for redirection
 # --------------------
 
-# resource "aws_s3_bucket" "frontend_redirect" {
-#   bucket = "www.${var.domain_name}"
-# }
+resource "aws_s3_bucket" "redirect" {
+  bucket = "www.${var.domain_name}"
+}
 
-# resource "aws_s3_bucket_website_configuration" "frontend_redirect" {
-#   bucket = aws_s3_bucket.frontend_redirect.bucket
+resource "aws_s3_bucket_website_configuration" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
 
-#   redirect_all_requests_to {
-#     host_name = "https://${var.domain_name}"
-#     protocol  = "https"
-#   }
-# }
+  redirect_all_requests_to {
+    host_name = var.domain_name
+    protocol  = "https"
+  }
+}
 
-# resource "aws_s3_bucket_acl" "main" {
-#   bucket = aws_s3_bucket.frontend_redirect.id
-#   acl    = "public-read"
-# }
+resource "aws_s3_bucket_acl" "redirect" {
+  bucket = aws_s3_bucket.redirect.id
+  acl    = "public-read"
+}
 
 
 resource "aws_s3_bucket_policy" "main" {
