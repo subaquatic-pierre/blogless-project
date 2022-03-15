@@ -1,6 +1,7 @@
 **/node_modules/
 **/.venv/
 **/__pycache__/
+**/__tests__/
 
 # Infrastrcutre ignore
 infrastructure/.terraform
@@ -14,5 +15,4 @@ infrastructure/.terraform.lock.hcl
 
 lambda_functions/blog_template/
 temp/
-postmanager/
-
+response.json

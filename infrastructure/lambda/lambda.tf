@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "list_all" {
-  function_name = "ListBucketContents"
+  function_name = "ListAll"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_functions.key
