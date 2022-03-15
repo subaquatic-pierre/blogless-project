@@ -13,4 +13,5 @@ infrastructure/terraform.tfstate
 infrastructure/terraform.tfstate.backup
 
 lambda_functions/blog_template/
+temp/
 
