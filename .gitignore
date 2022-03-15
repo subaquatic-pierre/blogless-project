@@ -6,11 +6,11 @@
 infrastructure/.terraform
 infrastructure/*.tfvars
 infrastructure/lambda/functions.zip
-infrastructure/variables.tf
 infrastructure/terraform.tfvars
 infrastructure/plan
 infrastructure/terraform.tfstate
 infrastructure/terraform.tfstate.backup
+infrastructure/.terraform.lock.hcl
 
 lambda_functions/blog_template/
 temp/
