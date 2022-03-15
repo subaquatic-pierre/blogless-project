@@ -29,8 +29,14 @@ provider "aws" {
 #   }
 # }
 
+module "api" {
+  source = "./api"
+}
+
 module "lambda" {
-  source = "./lambda"
+  source            = "./lambda"
+  api_execution_arn = module.api.api_execution_arn
+
 }
 
 module "content" {
