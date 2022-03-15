@@ -1,11 +1,11 @@
-resource "aws_lambda_function" "list_bucket_content" {
+resource "aws_lambda_function" "list_all" {
   function_name = "ListBucketContents"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_functions.key
 
   runtime = "python3.9"
-  handler = "list_bucket_contents.handler"
+  handler = "list.list_all"
 
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
 

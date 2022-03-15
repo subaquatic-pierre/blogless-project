@@ -14,4 +14,5 @@ infrastructure/.terraform.lock.hcl
 
 lambda_functions/blog_template/
 temp/
+postmanager/
 
