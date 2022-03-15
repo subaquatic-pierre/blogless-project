@@ -2,7 +2,8 @@
 # --------------------
 
 resource "aws_s3_bucket" "main" {
-  bucket = var.domain_name
+  bucket        = var.domain_name
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_website_configuration" "main" {
@@ -18,31 +19,23 @@ resource "aws_s3_bucket_website_configuration" "main" {
 
 }
 
-resource "aws_s3_bucket_acl" "main" {
-  bucket = aws_s3_bucket.main.id
-  acl    = "public-read"
-}
 
 # S3 bucket for redirection
 # --------------------
 
-resource "aws_s3_bucket" "redirect" {
-  bucket = "www.${var.domain_name}"
-}
+# resource "aws_s3_bucket" "redirect" {
+#   bucket = "www.${var.domain_name}"
+# force_destroy = true
+# }
 
-resource "aws_s3_bucket_website_configuration" "redirect" {
-  bucket = aws_s3_bucket.redirect.bucket
+# resource "aws_s3_bucket_website_configuration" "redirect" {
+#   bucket = aws_s3_bucket.redirect.bucket
 
-  redirect_all_requests_to {
-    host_name = var.domain_name
-    protocol  = "https"
-  }
-}
-
-resource "aws_s3_bucket_acl" "redirect" {
-  bucket = aws_s3_bucket.redirect.id
-  acl    = "public-read"
-}
+#   redirect_all_requests_to {
+#     host_name = var.domain_name
+#     protocol  = "https"
+#   }
+# }
 
 
 resource "aws_s3_bucket_policy" "main" {

@@ -34,15 +34,15 @@ resource "aws_route53_record" "main" {
   }
 }
 
-resource "aws_route53_record" "redirect" {
-  zone_id         = data.aws_route53_zone.main.id
-  name            = "www.${var.domain_name}"
-  type            = "A"
-  allow_overwrite = true
+# resource "aws_route53_record" "redirect" {
+#   zone_id         = data.aws_route53_zone.main.id
+#   name            = "www.${var.domain_name}"
+#   type            = "A"
+#   allow_overwrite = true
 
-  alias {
-    name                   = aws_cloudfront_distribution.redirect.domain_name
-    zone_id                = aws_cloudfront_distribution.redirect.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = aws_cloudfront_distribution.redirect.domain_name
+#     zone_id                = aws_cloudfront_distribution.redirect.hosted_zone_id
+#     evaluate_target_health = false
+#   }
+# }
