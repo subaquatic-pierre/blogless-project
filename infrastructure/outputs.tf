@@ -12,6 +12,10 @@ output "function_name" {
   value = module.lambda.function_name
 }
 
+output "api_list_blog" {
+  value = module.api.api_list_blog
+}
+
 # output "api_curl_domain_url" {
 #   depends_on = [module.api.aws_api_gateway_base_path_mapping]
 

@@ -29,20 +29,14 @@ provider "aws" {
 #   }
 # }
 
-# module "api" {
-#   source                      = "./api"
-#   acm_certificate_arn         = module.frontend.acm_certificate_arn
-#   acm_certificate_domain_name = module.frontend.acm_certificate_domain_name
-#   rest_api_name               = "blog"
-#   rest_api_path               = "blog/"
-
-#   lambda_list_all_invoke_arn = module.lambda.lambda_list_all_invoke_arn
-# }
+module "api" {
+  source                     = "./api"
+  lambda_list_all_invoke_arn = module.lambda.lambda_list_all_invoke_arn
+}
 
 module "lambda" {
-  source = "./lambda"
-  # api_execution_arn = "module.api.api_execution_arn"
-
+  source            = "./lambda"
+  api_execution_arn = module.api.api_execution_arn
 }
 
 module "content" {
