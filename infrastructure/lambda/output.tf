@@ -9,3 +9,8 @@ output "function_name" {
 
   value = aws_lambda_function.list_all.function_name
 }
+
+output "lambda_list_all_invoke_arn" {
+  value = aws_lambda_function.list_all.invoke_arn
+
+}
