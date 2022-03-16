@@ -30,7 +30,11 @@ provider "aws" {
 # }
 
 module "api" {
-  source = "./api"
+  source                      = "./api"
+  acm_certificate_arn         = module.frontend.acm_certificate_arn
+  acm_certificate_domain_name = module.frontend.acm_certificate_domain_name
+  rest_api_name               = "blog"
+  rest_api_path               = "blog/"
 }
 
 module "lambda" {
