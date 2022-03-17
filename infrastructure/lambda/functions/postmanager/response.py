@@ -9,7 +9,7 @@ class Response:
     def get_default_headers(self):
         return {"cool": "coolio"}
 
-    def to_json(self):
+    def format(self):
         data = {
             "isBase64Encoded": False,
             "statusCode": self.status_code,

@@ -10,8 +10,6 @@ resource "aws_s3_bucket_policy" "blog_content_policy" {
 
 data "aws_iam_policy_document" "blog_content_policy" {
   statement {
-    sid = "AddPerm"
-
     principals {
       type        = "AWS"
       identifiers = ["*"]
@@ -27,4 +25,22 @@ data "aws_iam_policy_document" "blog_content_policy" {
       "${aws_s3_bucket.blog_content.arn}/*",
     ]
   }
+
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [var.lambda_exec_iam_arn]
+    }
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      aws_s3_bucket.blog_content.arn,
+      "${aws_s3_bucket.blog_content.arn}/*",
+    ]
+  }
+
+
 }

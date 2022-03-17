@@ -1,19 +1,29 @@
-output "lambda_bucket_name" {
-  description = "Name of the S3 bucket used to store lambda function code."
-
-  value = aws_s3_bucket.lambda_bucket.id
+output "lambda_exec_iam_arn" {
+  value = aws_iam_role.lambda_exec.arn
 }
 
-output "function_name" {
-  description = "Name of the Lambda function."
-
-  value = aws_lambda_function.list.function_name
-}
-
+# lambda invoke ARN
 output "lambda_list_invoke_arn" {
   value = aws_lambda_function.list.invoke_arn
 }
-
 output "lambda_get_invoke_arn" {
   value = aws_lambda_function.get.invoke_arn
 }
+output "lambda_post_invoke_arn" {
+  value = aws_lambda_function.post.invoke_arn
+}
+output "lambda_put_invoke_arn" {
+  value = aws_lambda_function.put.invoke_arn
+}
+output "lambda_delete_invoke_arn" {
+  value = aws_lambda_function.delete.invoke_arn
+}
+
+output "lambda_title_to_id_invoke_arn" {
+  value = aws_lambda_function.title_to_id.invoke_arn
+}
+
+
+
+
+

@@ -30,11 +30,17 @@ provider "aws" {
 # }
 
 module "api" {
-  source                 = "./api"
-  lambda_list_invoke_arn = module.lambda.lambda_list_invoke_arn
-  lambda_get_invoke_arn  = module.lambda.lambda_get_invoke_arn
-  domain_name            = var.domain_name
-  acm_certificate_arn    = module.frontend.acm_certificate_arn
+  source              = "./api"
+  domain_name         = var.domain_name
+  acm_certificate_arn = module.frontend.acm_certificate_arn
+
+  # lambda invoke arns
+  lambda_list_invoke_arn        = module.lambda.lambda_list_invoke_arn
+  lambda_get_invoke_arn         = module.lambda.lambda_get_invoke_arn
+  lambda_put_invoke_arn         = module.lambda.lambda_put_invoke_arn
+  lambda_post_invoke_arn        = module.lambda.lambda_post_invoke_arn
+  lambda_delete_invoke_arn      = module.lambda.lambda_delete_invoke_arn
+  lambda_title_to_id_invoke_arn = module.lambda.lambda_title_to_id_invoke_arn
 }
 
 module "lambda" {
@@ -44,6 +50,8 @@ module "lambda" {
 
 module "content" {
   source = "./content"
+
+  lambda_exec_iam_arn = module.lambda.lambda_exec_iam_arn
 }
 
 module "frontend" {
