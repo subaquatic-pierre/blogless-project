@@ -30,10 +30,11 @@ provider "aws" {
 # }
 
 module "api" {
-  source                     = "./api"
-  lambda_list_all_invoke_arn = module.lambda.lambda_list_all_invoke_arn
-  domain_name                = var.domain_name
-  acm_certificate_arn        = module.frontend.acm_certificate_arn
+  source                 = "./api"
+  lambda_list_invoke_arn = module.lambda.lambda_list_invoke_arn
+  lambda_get_invoke_arn  = module.lambda.lambda_get_invoke_arn
+  domain_name            = var.domain_name
+  acm_certificate_arn    = module.frontend.acm_certificate_arn
 }
 
 module "lambda" {

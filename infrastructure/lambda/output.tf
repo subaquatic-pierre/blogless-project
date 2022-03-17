@@ -7,10 +7,13 @@ output "lambda_bucket_name" {
 output "function_name" {
   description = "Name of the Lambda function."
 
-  value = aws_lambda_function.list_all.function_name
+  value = aws_lambda_function.list.function_name
 }
 
-output "lambda_list_all_invoke_arn" {
-  value = aws_lambda_function.list_all.invoke_arn
+output "lambda_list_invoke_arn" {
+  value = aws_lambda_function.list.invoke_arn
+}
 
+output "lambda_get_invoke_arn" {
+  value = aws_lambda_function.get.invoke_arn
 }
