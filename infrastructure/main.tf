@@ -32,6 +32,8 @@ provider "aws" {
 module "api" {
   source                     = "./api"
   lambda_list_all_invoke_arn = module.lambda.lambda_list_all_invoke_arn
+  domain_name                = var.domain_name
+  acm_certificate_arn        = module.frontend.acm_certificate_arn
 }
 
 module "lambda" {
@@ -48,7 +50,6 @@ module "frontend" {
   tags         = var.tags
   ssl_cert_arn = var.ssl_cert_arn
   domain_name  = var.domain_name
-
 }
 
 # module "pipeline" {
