@@ -7,15 +7,6 @@ resource "aws_api_gateway_integration" "list" {
   uri                     = var.lambda_list_invoke_arn
 }
 
-resource "aws_api_gateway_integration" "title_to_id" {
-  rest_api_id             = aws_api_gateway_rest_api.main.id
-  resource_id             = aws_api_gateway_resource.title_to_id.id
-  http_method             = aws_api_gateway_method.title_to_id.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = var.lambda_title_to_id_invoke_arn
-}
-
 resource "aws_api_gateway_integration" "post" {
   rest_api_id             = aws_api_gateway_rest_api.main.id
   resource_id             = aws_api_gateway_resource.blog.id

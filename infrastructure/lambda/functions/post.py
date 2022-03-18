@@ -1,7 +1,5 @@
 from time import time
-import json
 from postmanager.manager import PostManager
-from postmanager.proxy import BucketProxy
 from postmanager.response import Response
 from postmanager.post import Post
 from postmanager.meta import PostMetaData
@@ -11,8 +9,10 @@ def post(event, context):
     path = event.get("path")
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
-    bucket_proxy = BucketProxy("serverless-blog-contents", f"{template_str}/")
-    post_manager = PostManager(template_name, bucket_proxy)
+
+    post_manager, bucket_proxy = PostManager.setup(
+        "serverless-blog-contents", template_name, f"{template_str}/"
+    )
 
     body = event.get("body")
 

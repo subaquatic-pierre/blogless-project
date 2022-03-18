@@ -3,13 +3,6 @@ resource "aws_api_gateway_method" "list" {
   resource_id   = aws_api_gateway_resource.blog.id
   http_method   = "GET"
   authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "title_to_id" {
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  resource_id   = aws_api_gateway_resource.title_to_id.id
-  http_method   = "GET"
-  authorization = "NONE"
 
   request_parameters = {
     "method.request.querystring.title" = true

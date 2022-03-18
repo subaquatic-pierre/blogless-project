@@ -2,7 +2,7 @@ import json
 
 
 class Response:
-    def __init__(self, body, status_code=200) -> None:
+    def __init__(self, body={}, status_code=200) -> None:
         self.status_code = status_code
         self.body = body
 

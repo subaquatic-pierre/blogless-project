@@ -10,8 +10,3 @@ resource "aws_api_gateway_resource" "get" {
   rest_api_id = aws_api_gateway_rest_api.main.id
 }
 
-resource "aws_api_gateway_resource" "title_to_id" {
-  path_part   = "title"
-  parent_id   = aws_api_gateway_resource.blog.id
-  rest_api_id = aws_api_gateway_rest_api.main.id
-}
