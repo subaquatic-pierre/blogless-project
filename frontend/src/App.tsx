@@ -4,6 +4,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 
+import NotificationContextProvider from "context/NotificationContext";
+
 import Layout from "layout";
 import BaseRouter from "routes";
 
@@ -16,9 +18,11 @@ function App() {
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Layout>
-          <BaseRouter />
-        </Layout>
+        <NotificationContextProvider>
+          <Layout>
+            <BaseRouter />
+          </Layout>
+        </NotificationContextProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
