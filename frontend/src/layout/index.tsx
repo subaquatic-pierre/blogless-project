@@ -2,7 +2,6 @@ import React from "react";
 
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 
 import AlertMessage from "components/AlertMessage";
 import SideNav from "components/SideNav";
@@ -20,8 +19,8 @@ const Layout: React.FC = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      {/* <TopNav
+    <Box sx={{ display: "flex" }}>
+      <TopNav
         drawerWidth={drawerWidth}
         handleDrawerToggle={handleDrawerToggle}
       />
@@ -29,20 +28,30 @@ const Layout: React.FC = ({ children }) => {
         drawerWidth={drawerWidth}
         handleDrawerToggle={handleDrawerToggle}
         mobileOpen={mobileOpen}
-      /> */}
+      />
 
       <Box
         sx={{
-          py: 2,
-          // width: { sm: `calc(100% - ${drawerWidth}px)` },
-          minHeight: `100vh`,
+          width: "100%",
+          [theme.breakpoints.up("sm")]: {
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+          },
           backgroundColor: theme.palette.secondary.light,
+          minHeight: `100vh`,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {/* <Toolbar />
-        <AlertMessage /> */}
-        <Box component="main">{children}</Box>
-        {/* <Footer /> */}
+        <AlertMessage />
+        <Box
+          sx={{
+            mt: 8,
+          }}
+          component="main"
+        >
+          {children}
+        </Box>
+        <Footer />
       </Box>
     </Box>
   );

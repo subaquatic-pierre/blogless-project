@@ -9,7 +9,7 @@ const Footer = () => {
         p: 2,
         display: "flex",
         justifyContent: "center",
-        mt: 5,
+        mt: "auto",
       }}
     >
       <Typography>Footer</Typography>
