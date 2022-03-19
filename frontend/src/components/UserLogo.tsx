@@ -4,8 +4,6 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 
-import formatWalletAddress from "utils/formatWalletAddress";
-
 interface IWalletAddress {
   walletAddress: string;
 }
@@ -19,7 +17,7 @@ const UserLogo: React.FC<IWalletAddress> = ({ walletAddress }) => {
         px: "20px",
       }}
     >
-      <Typography variant="h6">{formatWalletAddress(walletAddress)}</Typography>
+      <Typography variant="h6"></Typography>
       <Box
         sx={{
           maxHeight: "50px",
