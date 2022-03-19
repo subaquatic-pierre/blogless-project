@@ -6,7 +6,7 @@ interface INavLink {
 
 const navLinks: INavLink[] = [
   { text: "Home", link: "/", icon: "dashboard" },
-  { text: "Create", link: "wallet", icon: "create" },
+  { text: "Create", link: "create", icon: "create" },
 ];
 
 export function useNavLinks() {

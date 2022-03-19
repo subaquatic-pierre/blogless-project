@@ -11,7 +11,7 @@ interface INotificationMethods {
 }
 
 export const NotificationContext = React.createContext<
-  [INotificationState, INotificationMethods]
+  [INotificationState, INotificationMethods | null]
 >([initialNotificationState, null]);
 
 const NotificationContextProvider: React.FC = ({ children }) => {

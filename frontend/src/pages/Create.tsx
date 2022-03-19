@@ -3,12 +3,12 @@ import React from "react";
 import Page from "components/Page";
 import PageHeading from "components/PageHeading";
 
-const Home: React.FC = ({ children }) => {
+const Create = () => {
   return (
     <Page>
-      <PageHeading title="Home" />
+      <PageHeading title="Create Post" />
     </Page>
   );
 };
 
-export default Home;
+export default Create;
