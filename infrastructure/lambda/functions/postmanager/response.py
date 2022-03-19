@@ -7,7 +7,7 @@ class Response:
         self.body = body
 
     def get_default_headers(self):
-        return {"cool": "coolio"}
+        return {"cool": "coolio", "Access-Control-Allow-Origin": "*"}
 
     def format(self):
         data = {
