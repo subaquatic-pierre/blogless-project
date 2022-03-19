@@ -24,28 +24,11 @@ const TopNav: React.FC<ITopNavProps> = ({
   const [_n, { setWarning }] = useNotificationContext();
 
   const displayTopNavItems = () => {
-    if (correctNetwork) {
-      if (walletAddress) {
-        return <UserLogo walletAddress={walletAddress} />;
-      } else {
-        return (
-          <Button onClick={() => {}} variant="contained" size="large">
-            CONNECT WALLET
-          </Button>
-        );
-      }
-    } else {
-      return (
-        <Button
-          onClick={() => {}}
-          variant="contained"
-          size="large"
-          color="error"
-        >
-          CHANGE NETWORK
-        </Button>
-      );
-    }
+    return (
+      <Button onClick={() => {}} variant="contained">
+        LOGIN
+      </Button>
+    );
   };
 
   return (

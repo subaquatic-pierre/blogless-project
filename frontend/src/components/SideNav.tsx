@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 import BrandLogo from "components/BrandLogo";
 
-import { useNavLinks, useAdminLinks } from "hooks/useNavLinks";
+import { useNavLinks } from "hooks/useNavLinks";
 import filterIconByName from "utils/filterIconByName";
 
 interface ISideNavProps {
@@ -46,36 +46,11 @@ const NavList: React.FC<INavListProps> = ({ handleDrawerToggle }) => {
   );
 };
 
-const AdminNavList: React.FC<INavListProps> = ({ handleDrawerToggle }) => {
-  const links = useAdminLinks();
-  return (
-    <List color="inherit">
-      <Divider />
-      {links.map(({ text, link, icon }, index) => (
-        <Link
-          key={index}
-          style={{ textDecoration: "none", color: "inherit" }}
-          to={link}
-        >
-          <ListItem button onClick={handleDrawerToggle}>
-            <ListItemIcon sx={{ color: "inherit" }}>
-              {filterIconByName(icon)}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        </Link>
-      ))}
-    </List>
-  );
-};
-
 const SideNav: React.FC<ISideNavProps> = ({
   mobileOpen,
   drawerWidth,
   handleDrawerToggle,
 }) => {
-  const [isAdmin, setIsAdmin] = React.useState(true);
-
   return (
     <Box
       component="nav"
@@ -130,7 +105,6 @@ const SideNav: React.FC<ISideNavProps> = ({
         >
           <BrandLogo />
           <NavList />
-          {isAdmin && <AdminNavList />}
         </AppBar>
       </Drawer>
     </Box>
