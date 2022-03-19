@@ -1,24 +1,20 @@
 import React from "react";
-
+import { AlertColor } from "@mui/material/Alert";
 import { initialNotificationState } from "context/initialState";
-
-interface INotificationMethods {
-  setError: (message: string) => void;
-  setSuccess: (message: string) => void;
-  setInfo: (message: string) => void;
-  setWarning: (message: string) => void;
-  clearNotification: () => void;
-}
 
 export const NotificationContext = React.createContext<
   [INotificationState, INotificationMethods | null]
->([initialNotificationState, null]);
+>([initialNotificationState, {} as INotificationMethods]);
 
 const NotificationContextProvider: React.FC = ({ children }) => {
   const [notificationState, setNotificationState] =
     React.useState<INotificationState>(initialNotificationState);
 
-  const parseState = (oldState, message, color) => {
+  const parseState = (
+    oldState: INotificationState,
+    message: string,
+    color: AlertColor
+  ) => {
     return {
       ...oldState,
       isOpen: true,
