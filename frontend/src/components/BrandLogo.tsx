@@ -5,8 +5,16 @@ import Typography from "@mui/material/Typography";
 
 const BrandLogo: React.FC = () => {
   return (
-    <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+    <Toolbar
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        mt: 2,
+      }}
+    >
       <Typography variant="h5">Serverless</Typography>
+      <Typography variant="h5">Blog</Typography>
     </Toolbar>
   );
 };

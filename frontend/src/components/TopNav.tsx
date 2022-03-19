@@ -19,17 +19,15 @@ const TopNav: React.FC<ITopNavProps> = ({
   drawerWidth,
   handleDrawerToggle,
 }) => {
-  const [correctNetwork, setCorrectNetwork] = React.useState(false);
-  const [walletAddress, setWalletAddress] = React.useState("");
-  const [_n, { setWarning }] = useNotificationContext();
+  const [_, { setWarning }] = useNotificationContext();
 
-  const displayTopNavItems = () => {
-    return (
-      <Button onClick={() => {}} variant="contained">
-        LOGIN
-      </Button>
-    );
-  };
+  // const displayTopNavItems = () => {
+  //   return (
+  //     <Button onClick={() => {}} variant="contained">
+  //       LOGIN
+  //     </Button>
+  //   );
+  // };
 
   return (
     <>
@@ -52,9 +50,9 @@ const TopNav: React.FC<ITopNavProps> = ({
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ ml: "auto", display: { xs: "none", sm: "flex" } }}>
+          {/* <Box sx={{ ml: "auto", display: { xs: "none", sm: "flex" } }}>
             {displayTopNavItems()}
-          </Box>
+          </Box> */}
         </Toolbar>
       </AppBar>
     </>
