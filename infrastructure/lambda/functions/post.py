@@ -26,11 +26,11 @@ def post(event, context):
     content = {"aweseme": "awesome sesame streats"}
 
     # create post
-    meta = PostMetaData(new_id, title, timestamp, template_str)
-    post = Post(meta, bucket_proxy, content)
+    # meta = PostMetaData(new_id, title, timestamp, template_str)
+    # post = Post(meta, bucket_proxy, content)
 
     # save post
-    post_manager.save_post(post)
+    # post_manager.save_post(post)
 
     response = Response(body)
 

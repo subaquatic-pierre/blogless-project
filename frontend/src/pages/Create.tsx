@@ -1,5 +1,6 @@
 import React from "react";
 
+import axios, { Axios, AxiosResponse } from "axios";
 import { createReactEditorJS } from "react-editor-js";
 import { Formik, Field, Form, FormikHelpers, useFormik } from "formik";
 import * as yup from "yup";
@@ -14,11 +15,14 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
+import { API_DOMAIN_NAME } from "const";
+
 import Page from "components/Page";
 import PageHeading from "components/PageHeading";
 import Heading from "components/Heading";
 
 import { EDITOR_JS_TOOLS } from "tools";
+import useNotificationContext from "hooks/useNotificationContext";
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -38,12 +42,30 @@ const validationSchema = yup.object({
 });
 
 const Create = () => {
+  const [_, { setWarning }] = useNotificationContext();
   const editorCore = React.useRef(null);
+
+  const sendPostRequest = async (form: FormData): Promise<AxiosResponse> => {
+    const createPostUrl = `${API_DOMAIN_NAME}/blog`;
+    try {
+      const res = await axios.post(createPostUrl, form);
+      return res;
+    } catch (error) {
+      setWarning(error.message);
+    }
+  };
 
   const handleFormSubmit = async (values: IFormValues) => {
     const metaData = values;
     const content = await editorCore.current.save();
     console.log(JSON.stringify({ metaData, content }, null, 2));
+
+    const form = new FormData();
+    form.append("metaData", JSON.stringify(metaData));
+    form.append("content", content);
+
+    const response = await sendPostRequest(form);
+    console.log(response);
   };
 
   const formik = useFormik({
