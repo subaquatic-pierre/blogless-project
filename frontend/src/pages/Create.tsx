@@ -9,6 +9,10 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import Page from "components/Page";
 import PageHeading from "components/PageHeading";
@@ -20,23 +24,26 @@ const ReactEditorJS = createReactEditorJS();
 
 interface IFormValues {
   title: string;
+  category: string;
 }
 
 const initialValues: IFormValues = {
   title: "",
+  category: "Blog",
 };
 
 const validationSchema = yup.object({
   title: yup.string().required("Title is required"),
+  category: yup.string().required("Category is required"),
 });
 
 const Create = () => {
   const editorCore = React.useRef(null);
 
   const handleFormSubmit = async (values: IFormValues) => {
-    const formData = values;
-    const contentData = await editorCore.current.save();
-    console.log(JSON.stringify({ formData, contentData }, null, 2));
+    const metaData = values;
+    const content = await editorCore.current.save();
+    console.log(JSON.stringify({ metaData, content }, null, 2));
   };
 
   const formik = useFormik({
@@ -56,15 +63,31 @@ const Create = () => {
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={2}>
             <TextField
-              fullWidth
               id="title"
               name="title"
               label="Blog Title"
+              variant="standard"
               value={formik.values.title}
               onChange={formik.handleChange}
               error={formik.touched.title && Boolean(formik.errors.title)}
               helperText={formik.touched.title && formik.errors.title}
             />
+            <FormControl>
+              <InputLabel id="category-select-label">Category</InputLabel>
+              <Select
+                id="category"
+                name="category"
+                label="Category"
+                variant="standard"
+                value={formik.values.category}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.category && Boolean(formik.errors.category)
+                }
+              >
+                <MenuItem value={"Blog"}>Blog</MenuItem>
+              </Select>
+            </FormControl>
             <Box sx={{ my: 2 }}>
               <ReactEditorJS
                 defaultValue={[]}
