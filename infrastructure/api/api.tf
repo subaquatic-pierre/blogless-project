@@ -9,6 +9,10 @@ resource "aws_api_gateway_deployment" "main" {
   lifecycle {
     create_before_destroy = true
   }
+
+  triggers = {
+    redeployment = var.deployed_at
+  }
 }
 
 resource "aws_api_gateway_stage" "main" {

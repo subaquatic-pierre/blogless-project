@@ -1,5 +1,6 @@
 variable "acm_certificate_arn" {}
 variable "domain_name" {}
+variable "deployed_at" {}
 
 # Lambda ARN
 variable "lambda_list_invoke_arn" {}

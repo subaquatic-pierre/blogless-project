@@ -28,7 +28,7 @@ const Home: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     getPosts();
-  }, [posts]);
+  }, []);
 
   return (
     <Page>

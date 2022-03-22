@@ -41,6 +41,7 @@ module "api" {
   lambda_post_invoke_arn        = module.lambda.lambda_post_invoke_arn
   lambda_delete_invoke_arn      = module.lambda.lambda_delete_invoke_arn
   lambda_title_to_id_invoke_arn = module.lambda.lambda_title_to_id_invoke_arn
+  deployed_at                   = timestamp()
 }
 
 module "lambda" {
