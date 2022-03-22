@@ -17,13 +17,7 @@ const Home: React.FC = ({ children }) => {
     const postsRes = await axios.get(getPostsUrl);
     const posts = postsRes.data;
 
-    const newArr = [];
-
-    for (let i = 0; i < 4; i++) {
-      newArr.push(posts[0]);
-    }
-
-    setPosts(newArr);
+    setPosts(posts);
   };
 
   React.useEffect(() => {

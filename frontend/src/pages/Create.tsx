@@ -45,10 +45,10 @@ const Create = () => {
   const [_, { setWarning }] = useNotificationContext();
   const editorCore = React.useRef(null);
 
-  const sendPostRequest = async (form: FormData): Promise<AxiosResponse> => {
+  const sendPostRequest = async (data: any): Promise<AxiosResponse> => {
     const createPostUrl = `${API_DOMAIN_NAME}/blog`;
     try {
-      const res = await axios.post(createPostUrl, form);
+      const res = await axios.post(createPostUrl, data);
       return res;
     } catch (error) {
       setWarning(error.message);
@@ -58,13 +58,16 @@ const Create = () => {
   const handleFormSubmit = async (values: IFormValues) => {
     const metaData = values;
     const content = await editorCore.current.save();
+
     console.log(JSON.stringify({ metaData, content }, null, 2));
 
     const form = new FormData();
     form.append("metaData", JSON.stringify(metaData));
     form.append("content", content);
 
-    const response = await sendPostRequest(form);
+    const body = JSON.stringify({ metaData, content });
+
+    const response = await sendPostRequest(body);
     console.log(response);
   };
 
