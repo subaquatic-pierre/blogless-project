@@ -61,6 +61,16 @@ module "frontend" {
   domain_name  = var.domain_name
 }
 
+module "cors" {
+  source  = "mewa/apigateway-cors/aws"
+  version = "2.0.1"
+
+  api      = module.api.aws_api_gateway_rest_api_id
+  resource = module.api.aws_api_gateway_resource_blog_id
+
+  methods = ["GET", "POST"]
+}
+
 # module "pipeline" {
 #   source = "./pipeline"
 

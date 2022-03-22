@@ -7,7 +7,11 @@ class Response:
         self.body = body
 
     def get_default_headers(self):
-        return {"cool": "coolio", "Access-Control-Allow-Origin": "*"}
+        return {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+        }
 
     def format(self):
         data = {
