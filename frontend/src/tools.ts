@@ -1,7 +1,7 @@
 // tools.js
 import List from "@editorjs/list";
-import Header from "@editorjs/header";
-import SimpleImage from "@editorjs/simple-image";
+// import Header from "@editorjs/header";
+// import SimpleImage from "@editorjs/simple-image";
 // import Table from "@editorjs/table";
 // import Image from "@editorjs/image";
 // import InlineCode from "@editorjs/inline-code";
@@ -17,7 +17,7 @@ import SimpleImage from "@editorjs/simple-image";
 
 export const EDITOR_JS_TOOLS = {
   list: List,
-  header: Header,
+  // header: Header,
   // image: SimpleImage,
   //   inlineCode: InlineCode,
   //   image: Image,

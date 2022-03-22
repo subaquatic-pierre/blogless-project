@@ -59,9 +59,16 @@ const Create = () => {
   return (
     <Page>
       <PageHeading title="Create Post" />
-      <Paper sx={{ my: 2, p: 2 }}>
+      <Paper sx={{ my: 2, p: 4 }}>
         <form onSubmit={formik.handleSubmit}>
-          <Stack spacing={2}>
+          <Stack
+            spacing={4}
+            sx={{
+              "& .ce-block__content": {
+                maxWidth: "none",
+              },
+            }}
+          >
             <TextField
               id="title"
               name="title"
