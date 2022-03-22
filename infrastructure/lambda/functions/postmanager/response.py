@@ -20,7 +20,7 @@ class Response:
                 "isBase64Encoded": False,
                 "statusCode": self.status_code,
                 "headers": self.get_default_headers(),
-                "body": {"error": {"message": self.error_message}},
+                "body": json.dumps({"error": {"message": self.error_message}}),
             }
 
         data = {

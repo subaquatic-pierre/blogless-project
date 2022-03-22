@@ -1,6 +1,7 @@
 import React from "react";
 
-import axios, { Axios, AxiosResponse } from "axios";
+import { useNavigate } from "react-router-dom";
+import axios, { AxiosResponse } from "axios";
 import { createReactEditorJS } from "react-editor-js";
 import { Formik, Field, Form, FormikHelpers, useFormik } from "formik";
 import * as yup from "yup";
@@ -42,7 +43,8 @@ const validationSchema = yup.object({
 });
 
 const Create = () => {
-  const [_, { setWarning }] = useNotificationContext();
+  const navigate = useNavigate();
+  const [_, { setWarning, setSuccess }] = useNotificationContext();
   const editorCore = React.useRef(null);
 
   const sendPostRequest = async (data: any): Promise<AxiosResponse> => {
@@ -55,11 +57,17 @@ const Create = () => {
     }
   };
 
+  const parseResponse = (response) => {
+    if (response.data.error && response.data.error.message)
+      return response.data.error.message;
+    else {
+      return false;
+    }
+  };
+
   const handleFormSubmit = async (values: IFormValues) => {
     const metaData = values;
     const content = await editorCore.current.save();
-
-    console.log(JSON.stringify({ metaData, content }, null, 2));
 
     const form = new FormData();
     form.append("metaData", JSON.stringify(metaData));
@@ -68,7 +76,17 @@ const Create = () => {
     const body = JSON.stringify({ metaData, content });
 
     const response = await sendPostRequest(body);
-    console.log(response);
+
+    const error = parseResponse(response);
+
+    if (error) {
+      setWarning(error);
+    } else {
+      setSuccess("Post successfully created");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    }
   };
 
   const formik = useFormik({
