@@ -30,7 +30,7 @@ const Home: React.FC = ({ children }) => {
       <Grid container spacing={3} sx={{ my: 1 }}>
         {posts.map((post, i) => (
           <Grid item md={4} key={i}>
-            <PostCard title={post.title} imageUrl="someurl" />
+            <PostCard title={post.title} postId={post.id} imageUrl="someurl" />
           </Grid>
         ))}
       </Grid>

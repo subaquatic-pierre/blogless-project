@@ -6,13 +6,17 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router";
 
 interface PostCardProps {
   title: string;
+  postId: string;
   imageUrl: string;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ title, imageUrl }) => {
+const PostCard: React.FC<PostCardProps> = ({ title, imageUrl, postId }) => {
+  const navigate = useNavigate();
+
   return (
     <Card>
       <CardMedia
@@ -31,7 +35,9 @@ const PostCard: React.FC<PostCardProps> = ({ title, imageUrl }) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">View</Button>
+        <Button onClick={() => navigate(`/blog/${postId}`)} size="small">
+          View
+        </Button>
         <Button size="small">Edit</Button>
       </CardActions>
     </Card>
