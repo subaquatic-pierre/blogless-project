@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { createReactEditorJS } from "react-editor-js";
-import { Formik, Field, Form, FormikHelpers, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 import Box from "@mui/material/Box";
@@ -20,7 +20,6 @@ import { API_DOMAIN_NAME } from "const";
 
 import Page from "components/Page";
 import PageHeading from "components/PageHeading";
-import Heading from "components/Heading";
 
 import { EDITOR_JS_TOOLS } from "tools";
 import parseResponse from "utils/parseResponse";

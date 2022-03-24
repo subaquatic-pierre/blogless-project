@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { createReactEditorJS } from "react-editor-js";
-import { Formik, Field, Form, FormikHelpers, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 import Box from "@mui/material/Box";
@@ -16,6 +16,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 import Page from "components/Page";
+import PageHeading from "components/PageHeading";
+
 import parseResponse from "utils/parseResponse";
 import { API_DOMAIN_NAME } from "const";
 import { EDITOR_JS_TOOLS } from "tools";
@@ -43,7 +45,6 @@ const Edit = () => {
   const { id } = useParams();
   const [_, { setWarning, setSuccess }] = useNotificationContext();
   const editorCore = React.useRef(null);
-  const [blogData, setBlogData] = React.useState(false);
   const [formValues, setFormValues] =
     React.useState<IFormValues>(initialValues);
 
@@ -101,11 +102,11 @@ const Edit = () => {
     if (error) {
       setWarning(error);
     } else {
-      setBlogData(response.data);
-
+      const metaData = response.data.meta_data;
+      const content = response.data.content;
       setFormValues({
-        title: response.data.title,
-        category: response.data.template,
+        title: metaData.title,
+        category: metaData.template,
       });
     }
   };
@@ -119,11 +120,7 @@ const Edit = () => {
   }, [formValues]);
   return (
     <Page>
-      {blogData ? (
-        <div>{JSON.stringify(blogData)}</div>
-      ) : (
-        <div>Loading ...</div>
-      )}
+      <PageHeading title="Edit Post" />
       <Paper sx={{ my: 2, p: 4 }}>
         <form onSubmit={formik.handleSubmit}>
           <Stack
