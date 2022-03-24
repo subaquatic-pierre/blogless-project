@@ -23,6 +23,7 @@ import PageHeading from "components/PageHeading";
 import Heading from "components/Heading";
 
 import { EDITOR_JS_TOOLS } from "tools";
+import parseResponse from "utils/parseResponse";
 import useNotificationContext from "hooks/useNotificationContext";
 
 const ReactEditorJS = createReactEditorJS();
@@ -54,14 +55,6 @@ const Create = () => {
       return res;
     } catch (error) {
       setWarning(error.message);
-    }
-  };
-
-  const parseResponse = (response) => {
-    if (response.data.error && response.data.error.message)
-      return response.data.error.message;
-    else {
-      return false;
     }
   };
 

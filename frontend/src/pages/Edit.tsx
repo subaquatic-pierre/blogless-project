@@ -1,17 +1,31 @@
 import React from "react";
 import { useParams } from "react-router";
+import { useNavigate } from "react-router-dom";
+import parseResponse from "utils/parseResponse";
 
 import Page from "components/Page";
 import axios from "axios";
 import { API_DOMAIN_NAME } from "const";
+import useNotificationContext from "hooks/useNotificationContext";
 
 const Edit = () => {
-  const blogId = useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [_, { setWarning, setSuccess }] = useNotificationContext();
+
   const [blogData, setBlogData] = React.useState(false);
 
   const fetchBlogData = async () => {
-    const response = await axios.get(`${API_DOMAIN_NAME}/blog/${blogId}`);
-    console.log(response);
+    const url = `${API_DOMAIN_NAME}/blog/${id}`;
+    const response = await axios.get(url);
+
+    const error = parseResponse(response);
+
+    if (error) {
+      setWarning(error);
+    } else {
+      setBlogData(response.data);
+    }
   };
 
   React.useEffect(() => {

@@ -38,7 +38,9 @@ const PostCard: React.FC<PostCardProps> = ({ title, imageUrl, postId }) => {
         <Button onClick={() => navigate(`/blog/${postId}`)} size="small">
           View
         </Button>
-        <Button size="small">Edit</Button>
+        <Button onClick={() => navigate(`/blog/${postId}/edit`)} size="small">
+          Edit
+        </Button>
       </CardActions>
     </Card>
   );

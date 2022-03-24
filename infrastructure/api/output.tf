@@ -10,9 +10,15 @@ output "aws_api_gateway_rest_api_id" {
   value = aws_api_gateway_rest_api.main.id
 }
 
-output "aws_api_gateway_resource_blog_id" {
+output "aws_api_gateway_resource_main_id" {
   description = "Blog API resource ID"
 
   value = aws_api_gateway_resource.blog.id
+}
+
+output "aws_api_gateway_resource_blog_id" {
+  description = "Blog API resource ID"
+
+  value = aws_api_gateway_resource.get.id
 }
 
