@@ -1,4 +1,5 @@
 import json
+from re import M
 from unittest import TestCase
 from unittest.mock import MagicMock
 
@@ -6,6 +7,11 @@ from postmanager.proxy import BucketProxy
 
 BUCKET_NAME = "serverless-blog-contents"
 BUCKET_ROOT_DIR = "blog/"
+
+
+class KeyMock:
+    def __init__(self, key) -> None:
+        self.key = key
 
 
 class BodyMock:
@@ -35,23 +41,33 @@ class ResourceMock:
 
 
 class BucketInterfaceMock:
-    pass
+    def put_object(self):
+        return MagicMock
+
+    def delete_files(self):
+        return MagicMock
+
+    def list_dir(self, dir):
+        return MagicMock
+
+    def save_bytes(self, body, filename):
+        return MagicMock
 
 
 class BucketProxyTest(TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.bucket = BucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR)
-        self.bucket.bucket_interface = BucketInterfaceMock
+        self.bucket.bucket_interface = MagicMock()
         self.bucket.s3_interface = ResourceMock
 
     def test_get_json(self):
         bucket = BucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR)
         bucket.s3_interface.Object = MagicMock(return_value=ObjectMock)
-        obect_key = "index.json"
-        json = bucket.get_json(obect_key)
+        object_key = "index.json"
+        json = bucket.get_json(object_key)
         bucket.s3_interface.Object.assert_called_once_with(
-            BUCKET_NAME, f"{BUCKET_ROOT_DIR}{obect_key}"
+            BUCKET_NAME, f"{BUCKET_ROOT_DIR}{object_key}"
         )
         self.assertIn("test", json)
 
@@ -59,3 +75,52 @@ class BucketProxyTest(TestCase):
         object_key = "index.json"
         json = self.bucket.get_json(object_key)
         self.assertIn("test", json)
+
+    def test_save_json(self):
+        filename = "filename.txt"
+        body = {}
+        self.bucket.save_json(body, filename)
+
+        call_count = self.bucket.bucket_interface.put_object.call_count
+        self.assertEqual(call_count, 2)
+
+        self.bucket.bucket_interface.put_object.assert_called_with(
+            Key=f"{BUCKET_ROOT_DIR}{filename}", Body=json.dumps(body)
+        )
+
+    def test_delete_files(self):
+        filenames = ["filename1.txt", "filename1.txt"]
+
+        self.bucket.delete_files(filenames)
+        objects = [{"Key": filename} for filename in filenames]
+        self.bucket.bucket_interface.delete_objects.assert_called_with(
+            Delete={"Objects": objects}
+        )
+
+    def test_delete_files_empty_array(self):
+        filenames = []
+
+        self.bucket.delete_files(filenames)
+        self.bucket.bucket_interface.delete_objects.assert_not_called()
+
+    def test_list_directory(self):
+        key_list = [f"{BUCKET_ROOT_DIR}something", f"{BUCKET_ROOT_DIR}somethingelse"]
+
+        all_dirs = [KeyMock(key_list[0]), KeyMock(key_list[1])]
+
+        self.bucket.bucket_interface.objects.all = MagicMock(return_value=all_dirs)
+        dir_response = self.bucket.list_dir()
+        self.bucket.bucket_interface.objects.all.assert_called_once()
+
+        self.assertEqual(key_list, dir_response)
+
+    def test_save_bytes(self):
+        body = b"0x00"
+        filename = "something.jpg"
+        self.bucket.save_bytes(body, filename)
+
+        call_count = self.bucket.bucket_interface.put_object.call_count
+
+        self.bucket.bucket_interface.put_object.assert_called_with(
+            Key=f"{BUCKET_ROOT_DIR}{filename}", Body=body
+        )
