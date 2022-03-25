@@ -34,9 +34,30 @@ class TestPostManager(TestCase):
         self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
         self.assertIsInstance(index, list)
 
-    # def test_list_all(self):
-    #     all_posts = self.blog_manager.list_all()
-    #     self.assertNotEqual(all_posts, 0, "No posts returned from index call")
+    def test_list_all_files(self):
+        attrs = {"list_dir.return_value": []}
+        self.bucket_proxy.configure_mock(**attrs)
+        all_posts = self.blog_manager.list_all_files()
+
+        self.assertTrue(self.blog_manager.bucket_proxy.list_dir.called)
+        self.assertIsInstance(all_posts, list)
+
+    def test_get_latest_id(self):
+        attrs = {"get_json.return_value": ["first", "second"]}
+        self.bucket_proxy.configure_mock(**attrs)
+        latest_id = self.blog_manager.get_latest_id()
+
+        self.bucket_proxy.get_json.assert_called_with("index.json")
+        self.assertEqual(latest_id, 2)
+
+    def test_get_json(self):
+        filename = "filename.txt"
+        attrs = {"get_json.return_value": {}}
+        self.bucket_proxy.configure_mock(**attrs)
+        json_res = self.blog_manager.get_json(filename)
+
+        self.assertIsInstance(json_res, dict)
+        self.bucket_proxy.get_json.assert_called_with(filename)
 
     # def test_title_to_id_success(self):
     #     post_id = self.blog_manager.title_to_id("Nervous Poincare")

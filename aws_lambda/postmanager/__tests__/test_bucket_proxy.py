@@ -103,7 +103,7 @@ class BucketProxyTest(TestCase):
         self.bucket.delete_files(filenames)
         self.bucket.bucket_interface.delete_objects.assert_not_called()
 
-    def test_list_directory(self):
+    def test_list_dir(self):
         key_list = [f"{BUCKET_ROOT_DIR}something", f"{BUCKET_ROOT_DIR}somethingelse"]
 
         all_dirs = [KeyMock(key_list[0]), KeyMock(key_list[1])]
@@ -112,6 +112,7 @@ class BucketProxyTest(TestCase):
         dir_response = self.bucket.list_dir()
         self.bucket.bucket_interface.objects.all.assert_called_once()
 
+        self.assertIsInstance(dir_response, list)
         self.assertEqual(key_list, dir_response)
 
     def test_save_bytes(self):

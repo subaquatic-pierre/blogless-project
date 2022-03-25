@@ -47,10 +47,6 @@ class PostManager:
         self._verify_meta(meta)
         return meta[0]["id"]
 
-    def list_all(self) -> dict:
-        all_posts = self.bucket_proxy.get_json("index.json")
-        return all_posts
-
     def save_post(self, post: Post):
         # Update index and save post
         try:
