@@ -49,7 +49,7 @@ class Post:
         return self.bucket_proxy.list_dir()
 
     def to_json(self):
-        return self.meta_data.to_json()
+        return {"meta_data": self.meta_data.to_json(), "content": self.content}
 
     def _base_image_url(self):
         return f"https://{self.bucket_proxy.bucket_name}.s3.amazonaws.com/"

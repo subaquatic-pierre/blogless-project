@@ -1,28 +1,18 @@
-from abc import ABC, abstractmethod
 import json
 import boto3
 
-s3 = boto3.resource("s3")
 
-
-class BaseBucketProxy(ABC):
+class BucketProxy:
     def __init__(self, bucket_name, root_dir) -> None:
         self.bucket_name = bucket_name
         self.root_dir = root_dir
-        self.bucket_interface = s3.Bucket(bucket_name)
+        self.bucket_interface = boto3.resource("s3").Bucket(bucket_name)
+        self.s3_interface = boto3.resource("s3")
 
-    @abstractmethod
-    def get_json(self, filename):
-        pass
-
-    @abstractmethod
-    def save_json(self, filename):
-        pass
-
-
-class BucketProxy(BaseBucketProxy):
     def get_json(self, object_key):
-        object = s3.Object(self.bucket_name, f"{self.root_dir}{object_key}")
+        object = self.s3_interface.Object(
+            self.bucket_name, f"{self.root_dir}{object_key}"
+        )
         object_res = object.get()
         object_json = json.loads(object_res["Body"].read())
         return object_json

@@ -2,20 +2,27 @@ from postmanager.manager import PostManager
 from postmanager.response import Response
 
 
-def delete(event, context):
+def put(event, context):
     path = event.get("path")
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
+
     post_manager, _ = PostManager.setup(
         "serverless-blog-contents", template_name, f"{template_str}/"
     )
 
-    # get post id
-    post_id = int(path.split("/")[-1])
+    blog_id = path.split("/")[-1]
+    post = post_manager.get_by_id(int(blog_id))
 
-    # delete post
-    # post_manager.delete_post(post_id)
+    response = Response(event)
+    return response.format()
 
-    response = Response(post_manager.index)
+    # get values from form
+
+    # update post
+    response = Response(post.to_json())
+
+    # save post
+    # post_manager.save_post(post)
 
     return response.format()
