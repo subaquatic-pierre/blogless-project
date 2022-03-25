@@ -7,36 +7,32 @@ from postmanager.manager import PostManager
 from postmanager.proxy import BucketProxy
 
 
-def setup_bucket_proxy():
-    bucket_proxy = BucketProxy("serverless-blog-contents", "blog/")
-    bucket_proxy.save_json = MagicMock()
-    bucket_proxy.get_json = MagicMock()
-    return bucket_proxy
-
-
 class TestPostManager(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        bucket_proxy = setup_bucket_proxy()
-        self.blog_manager = PostManager("Blog", bucket_proxy)
+        self.bucket_proxy = MagicMock()
+        self.blog_manager = PostManager("Blog", self.bucket_proxy)
 
     def test_manager_init_success(self):
-        bucket_proxy = setup_bucket_proxy()
+        bucket_proxy = MagicMock()
         blog_manager = PostManager("Blog", bucket_proxy)
 
         blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
 
     def test_manager_init_setup(self):
-        bucket_proxy = setup_bucket_proxy()
+        bucket_proxy = MagicMock()
         bucket_proxy.get_json.side_effect = Exception("Boom!")
         blog_manager = PostManager("Blog", bucket_proxy)
 
         blog_manager.bucket_proxy.save_json.assert_called_with([], "index.json")
 
-    def test_index(self):
+    def test_get_index(self):
+        attrs = {"get_json.return_value": []}
+        self.bucket_proxy.configure_mock(**attrs)
         index = self.blog_manager.index
         self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
+        self.assertIsInstance(index, list)
 
     # def test_list_all(self):
     #     all_posts = self.blog_manager.list_all()
