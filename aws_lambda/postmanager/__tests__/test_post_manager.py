@@ -11,6 +11,16 @@ BUCKET_NAME = "serverless-blog-contents"
 BUCKET_ROOT_DIR = "blog/"
 
 
+def create_dummy_bucket_proxy():
+    bucket_proxy = BucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR)
+
+    bucket_proxy.get_json = MagicMock()
+    bucket_proxy.save_json = MagicMock()
+    bucket_proxy.delete_files = MagicMock()
+    bucket_proxy.list_dir = MagicMock()
+    return bucket_proxy
+
+
 def create_dummy_post():
     # Create post
     post_id = 0
@@ -36,7 +46,7 @@ class TestPostManager(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.bucket_proxy = MagicMock()
+        self.bucket_proxy = create_dummy_bucket_proxy()
         self.blog_manager = PostManager("Blog", self.bucket_proxy)
 
     def test_manager_init_success(self):
@@ -53,23 +63,20 @@ class TestPostManager(TestCase):
         blog_manager.bucket_proxy.save_json.assert_called_with([], "index.json")
 
     def test_get_index(self):
-        attrs = {"get_json.return_value": []}
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = []
         index = self.blog_manager.index
         self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
         self.assertIsInstance(index, list)
 
     def test_list_all_files(self):
-        attrs = {"list_dir.return_value": []}
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.list_dir.return_value = []
         all_posts = self.blog_manager.list_all_files()
 
         self.assertTrue(self.blog_manager.bucket_proxy.list_dir.called)
         self.assertIsInstance(all_posts, list)
 
     def test_get_latest_id(self):
-        attrs = {"get_json.return_value": ["first", "second"]}
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = ["first", "second"]
         latest_id = self.blog_manager._get_latest_id()
 
         self.bucket_proxy.get_json.assert_called_with("index.json")
@@ -77,8 +84,7 @@ class TestPostManager(TestCase):
 
     def test_get_json(self):
         filename = "filename.txt"
-        attrs = {"get_json.return_value": {}}
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = {}
         json_res = self.blog_manager.get_json(filename)
 
         self.assertIsInstance(json_res, dict)
@@ -86,12 +92,9 @@ class TestPostManager(TestCase):
 
     def test_get_by_id(self):
         post_id = 0
-        attrs = {
-            "get_json.return_value": [
-                {"id": post_id, "title": "Sometitle", "timestamp": 000}
-            ]
-        }
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = [
+            {"id": post_id, "title": "Sometitle", "timestamp": 000}
+        ]
 
         post = self.blog_manager.get_by_id(post_id)
 
@@ -101,12 +104,9 @@ class TestPostManager(TestCase):
 
     def test_get_by_id_error(self):
         post_id = 0
-        attrs = {
-            "get_json.return_value": [
-                {"id": "noid", "title": "Sometitle", "timestamp": 000}
-            ]
-        }
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = [
+            {"id": "noid", "title": "Sometitle", "timestamp": 000}
+        ]
         with self.assertRaises(Exception) as e:
             self.blog_manager.get_by_id(post_id)
 
@@ -115,12 +115,9 @@ class TestPostManager(TestCase):
     def test_title_to_id(self):
         post_id = 0
         post_title = "Sometitle"
-        attrs = {
-            "get_json.return_value": [
-                {"id": post_id, "title": post_title, "timestamp": 000}
-            ]
-        }
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = [
+            {"id": post_id, "title": post_title, "timestamp": 000}
+        ]
 
         post_id = self.blog_manager.title_to_id(post_title)
 
@@ -129,12 +126,9 @@ class TestPostManager(TestCase):
 
     def test_title_to_id_error(self):
         post_id = 0
-        attrs = {
-            "get_json.return_value": [
-                {"id": "noid", "title": "Sometitle", "timestamp": 000}
-            ]
-        }
-        self.bucket_proxy.configure_mock(**attrs)
+        self.bucket_proxy.get_json.return_value = [
+            {"id": "noid", "title": "Sometitle", "timestamp": 000}
+        ]
         with self.assertRaises(Exception) as e:
             self.blog_manager.title_to_id(post_id)
 
@@ -145,19 +139,22 @@ class TestPostManagerWithPost(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.bucket_proxy = MagicMock()
+        self.bucket_proxy = create_dummy_bucket_proxy()
         self.blog_manager = PostManager("Blog", self.bucket_proxy)
 
     def test_create_post(self):
         post_title = "Amazing Post"
-        post_content = "Cool post content"
+        post_content = {"blocks": "Cool post content"}
         post = self.blog_manager.create_post(post_title, post_content)
+
+        post_root_dir = f"{self.blog_manager.bucket_proxy.root_dir}{post.id}"
 
         post.bucket_proxy.get_json = MagicMock(return_value=post_content)
 
         self.assertEqual(post.id, 0)
         self.assertEqual(post.title, post_title)
         self.assertEqual(post.content, post_content)
+        self.assertEqual(post.bucket_proxy.root_dir, post_root_dir)
 
     def test_save_post(self):
         post = self.blog_manager.create_post = MagicMock(
@@ -186,16 +183,8 @@ class TestPostManagerWithPost(TestCase):
         self.blog_manager._update_index.assert_not_called()
         self.assertEqual(str(e.exception), "Post could not be saved")
 
-    # def test_save_post_error(self):
-    #     post = create_post(error=True)
-
-    #     self.blog_manager._update_index = MagicMock()
-
-    #     with self.assertRaises(Exception) as e:
-    #         self.blog_manager.save_post(post)
-
-    #     self.blog_manager._update_index.assert_not_called()
-    #     self.assertEqual(str(e.exception), "Post could not be saved")
+    def test_delete_post(self):
+        pass
 
     # def test_save_post(self):
     #     # Post args

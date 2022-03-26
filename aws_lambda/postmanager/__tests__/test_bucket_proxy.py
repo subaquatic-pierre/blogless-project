@@ -62,14 +62,16 @@ class BucketProxyTest(TestCase):
         self.bucket.s3_interface = ResourceMock
 
     def test_get_json(self):
-        bucket = BucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR)
+        bucket = BucketProxy(BUCKET_NAME, self.bucket.root_dir)
         bucket.s3_interface.Object = MagicMock(return_value=ObjectMock)
         object_key = "index.json"
         json = bucket.get_json(object_key)
+
         bucket.s3_interface.Object.assert_called_once_with(
-            BUCKET_NAME, f"{BUCKET_ROOT_DIR}{object_key}"
+            BUCKET_NAME, f"{self.bucket.root_dir}{object_key}"
         )
         self.assertIn("test", json)
+        self.assertIsInstance(json, dict)
 
     def test_get_json_resource_mock(self):
         object_key = "index.json"
@@ -85,7 +87,7 @@ class BucketProxyTest(TestCase):
         self.assertEqual(call_count, 2)
 
         self.bucket.bucket_interface.put_object.assert_called_with(
-            Key=f"{BUCKET_ROOT_DIR}{filename}", Body=json.dumps(body)
+            Key=f"{self.bucket.root_dir}{filename}", Body=json.dumps(body)
         )
 
     def test_delete_files(self):
@@ -104,7 +106,10 @@ class BucketProxyTest(TestCase):
         self.bucket.bucket_interface.delete_objects.assert_not_called()
 
     def test_list_dir(self):
-        key_list = [f"{BUCKET_ROOT_DIR}something", f"{BUCKET_ROOT_DIR}somethingelse"]
+        key_list = [
+            f"{self.bucket.root_dir}something",
+            f"{self.bucket.root_dir}somethingelse",
+        ]
 
         all_dirs = [KeyMock(key_list[0]), KeyMock(key_list[1])]
 
@@ -123,5 +128,5 @@ class BucketProxyTest(TestCase):
         call_count = self.bucket.bucket_interface.put_object.call_count
 
         self.bucket.bucket_interface.put_object.assert_called_with(
-            Key=f"{BUCKET_ROOT_DIR}{filename}", Body=body
+            Key=f"{self.bucket.root_dir}{filename}", Body=body
         )

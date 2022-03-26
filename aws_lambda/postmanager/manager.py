@@ -85,17 +85,21 @@ class PostManager:
             raise Exception("Post could not be saved")
 
     def delete_post(self, id: int):
-        post = self.get_by_id(id)
-        post_files = post.list_files()
+        try:
+            post = self.get_by_id(id)
+            post_files = post.list_files()
 
-        # Add root dir to filenames
-        post_files.append(post.bucket_proxy.root_dir)
-        self.bucket_proxy.delete_files(post_files)
+            # Add root dir to filenames
+            post_files.append(post.bucket_proxy.root_dir)
+            self.bucket_proxy.delete_files(post_files)
 
-        # Update index
-        index = self.index
-        new_index = [meta for meta in index if meta["id"] != id]
-        self._update_index(new_index)
+            # Update index
+            index = self.index
+            new_index = [meta for meta in index if meta["id"] != id]
+            self._update_index(new_index)
+
+        except Exception as e:
+            raise Exception(e)
 
     def _get_latest_id(self):
         return len(self.index)
