@@ -1,6 +1,4 @@
 from unittest import TestCase
-import os
-import json
 from unittest.mock import MagicMock, call
 
 from postmanager.manager import PostManager
@@ -13,7 +11,7 @@ BUCKET_NAME = "serverless-blog-contents"
 BUCKET_ROOT_DIR = "blog/"
 
 
-def create_post():
+def create_dummy_post():
     # Create post
     post_id = 0
     post_title = "Sometitle"
@@ -72,7 +70,7 @@ class TestPostManager(TestCase):
     def test_get_latest_id(self):
         attrs = {"get_json.return_value": ["first", "second"]}
         self.bucket_proxy.configure_mock(**attrs)
-        latest_id = self.blog_manager.get_latest_id()
+        latest_id = self.blog_manager._get_latest_id()
 
         self.bucket_proxy.get_json.assert_called_with("index.json")
         self.assertEqual(latest_id, 2)
@@ -150,8 +148,21 @@ class TestPostManagerWithPost(TestCase):
         self.bucket_proxy = MagicMock()
         self.blog_manager = PostManager("Blog", self.bucket_proxy)
 
+    def test_create_post(self):
+        post_title = "Amazing Post"
+        post_content = "Cool post content"
+        post = self.blog_manager.create_post(post_title, post_content)
+
+        post.bucket_proxy.get_json = MagicMock(return_value=post_content)
+
+        self.assertEqual(post.id, 0)
+        self.assertEqual(post.title, post_title)
+        self.assertEqual(post.content, post_content)
+
     def test_save_post(self):
-        post = create_post()
+        post = self.blog_manager.create_post = MagicMock(
+            return_value=create_dummy_post()
+        )
 
         self.blog_manager._update_index = MagicMock()
 
@@ -162,7 +173,9 @@ class TestPostManagerWithPost(TestCase):
         self.assertEqual(post, return_value)
 
     def test_save_post_error(self):
-        post = create_post()
+        post = self.blog_manager.create_post = MagicMock(
+            return_value=create_dummy_post()
+        )
         post.save = MagicMock(side_effect=Exception)
 
         self.blog_manager._update_index = MagicMock()

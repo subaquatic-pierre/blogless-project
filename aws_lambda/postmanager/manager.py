@@ -24,9 +24,6 @@ class PostManager:
     def list_all_files(self):
         return self.bucket_proxy.list_dir()
 
-    def get_latest_id(self):
-        return len(self.index)
-
     def get_json(self, filename):
         return self.bucket_proxy.get_json(filename)
 
@@ -49,14 +46,16 @@ class PostManager:
         return meta[0]["id"]
 
     def create_post(self, title, content):
-        new_id = self.get_latest_id()
+        # New post args
+        new_id = self._get_latest_id()
+        template_name = self.template_name
+        bucket_name = self.bucket_proxy.bucket_name
+        post_root_dir = f"{self.bucket_proxy.root_dir}{new_id}"
         timestamp = int(time())
 
-        post_bucket_proxy = BucketProxy(
-            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}"
-        )
+        post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
 
-        meta = PostMetaData(new_id, title, timestamp, self.template_name)
+        meta = PostMetaData(new_id, title, timestamp, template_name)
         post = Post(meta, post_bucket_proxy, content)
 
         return post
@@ -97,6 +96,9 @@ class PostManager:
         index = self.index
         new_index = [meta for meta in index if meta["id"] != id]
         self._update_index(new_index)
+
+    def _get_latest_id(self):
+        return len(self.index)
 
     def _update_index(self, new_index: list):
         self.bucket_proxy.save_json(new_index, "index.json")
