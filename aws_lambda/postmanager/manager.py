@@ -63,8 +63,8 @@ class PostManager:
             else:
                 index.append(post.meta_data.to_json())
 
-            self._update_index(index)
             post.save()
+            self._update_index(index)
 
             return post
 

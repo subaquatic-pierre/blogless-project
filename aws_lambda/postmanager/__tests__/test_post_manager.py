@@ -13,6 +13,29 @@ BUCKET_NAME = "serverless-blog-contents"
 BUCKET_ROOT_DIR = "blog/"
 
 
+def create_post(error=False):
+    # Create post
+    post_id = 0
+    post_title = "Sometitle"
+    timestamp = 000
+    post_template = "Blog"
+    content = "My amazing content"
+    post_bucket_proxy = BucketProxy(
+        BUCKET_NAME, f"{BUCKET_NAME,BUCKET_ROOT_DIR}{post_id}"
+    )
+    post_meta = PostMetaData(post_id, post_title, timestamp, post_template)
+    post = Post(post_meta, post_bucket_proxy, content)
+
+    # Configure post mocks
+    if error:
+        post.save = MagicMock(side_effect=Exception)
+    else:
+        post.save = MagicMock()
+    post.to_json = MagicMock()
+
+    return post
+
+
 class TestPostManager(TestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -122,40 +145,57 @@ class TestPostManager(TestCase):
         self.assertEqual(str(e.exception), "No blog with that title found")
 
     def test_save_post(self):
-        # Post args
-        post_id = 0
-        post_title = "Sometitle"
-        timestamp = 000
-        post_template = "Blog"
-        content = "My amazing content"
+        post = create_post()
 
-        bucket_proxy_return_mock_value = []
-        attrs = {"get_json.return_value": bucket_proxy_return_mock_value}
-        self.bucket_proxy.configure_mock(**attrs)
-
-        # Create post
-        post_bucket_proxy = BucketProxy(
-            BUCKET_NAME, f"{BUCKET_NAME,BUCKET_ROOT_DIR}{post_id}"
-        )
-        post_meta = PostMetaData(post_id, post_title, timestamp, post_template)
-        post_meta.to_json = MagicMock()
-        post = Post(post_meta, post_bucket_proxy, content)
-
-        # Configure post mocks
-        post.save = MagicMock()
-        post.to_json = MagicMock()
         self.blog_manager._update_index = MagicMock()
 
         return_value = self.blog_manager.save_post(post)
 
-        self.blog_manager.bucket_proxy.get_json.assert_has_calls(
-            [call("index.json"), call("index.json")]
-        )
-
-        self.blog_manager._update_index.assert_called_once()
+        self.blog_manager._update_index.assert_called()
         post.save.assert_called_once()
-        post.meta_data.to_json.assert_called_once()
         self.assertEqual(post, return_value)
+
+    def test_save_post_error(self):
+        post = create_post(error=True)
+
+        self.blog_manager._update_index = MagicMock()
+
+        with self.assertRaises(Exception) as e:
+            self.blog_manager.save_post(post)
+
+        self.blog_manager._update_index.assert_not_called()
+        self.assertEqual(str(e.exception), "Post could not be saved")
+
+    # def test_save_post(self):
+    #     # Post args
+    #     post_id = 0
+    #     post_title = "Sometitle"
+    #     timestamp = 000
+    #     post_template = "Blog"
+    #     content = "My amazing content"
+
+    #     bucket_proxy_return_mock_value = []
+    #     attrs = {"get_json.return_value": bucket_proxy_return_mock_value}
+    #     self.bucket_proxy.configure_mock(**attrs)
+
+    #     # Create post
+    #     post_bucket_proxy = BucketProxy(
+    #         BUCKET_NAME, f"{BUCKET_NAME,BUCKET_ROOT_DIR}{post_id}"
+    #     )
+    #     post_meta = PostMetaData(post_id, post_title, timestamp, post_template)
+    #     post_meta.to_json = MagicMock()
+    #     post = Post(post_meta, post_bucket_proxy, content)
+
+    #     self.blog_manager._update_index = MagicMock()
+
+    #     return_value = self.blog_manager.save_post(post)
+
+    #     self.blog_manager.bucket_proxy.get_json.assert_has_calls(
+    #         [call("index.json"), call("index.json")]
+    #     )
+
+    #     post.save.assert_called_once()
+    #     self.assertEqual(post, return_value)
 
     # def test_title_to_id_success(self):
     #     post_id = self.blog_manager.title_to_id("Nervous Poincare")
