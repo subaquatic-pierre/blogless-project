@@ -1,3 +1,4 @@
+from time import time
 from postmanager.meta import PostMetaData
 from postmanager.post import Post
 from postmanager.proxy import BucketProxy
@@ -46,6 +47,19 @@ class PostManager:
         meta = [blog_meta for blog_meta in self.index if blog_meta["title"] == title]
         self._verify_meta(meta, "No blog with that title found")
         return meta[0]["id"]
+
+    def create_post(self, title, content):
+        new_id = self.get_latest_id()
+        timestamp = int(time())
+
+        post_bucket_proxy = BucketProxy(
+            self.bucket_proxy.bucket_name, f"{self.bucket_proxy.root_dir}{new_id}"
+        )
+
+        meta = PostMetaData(new_id, title, timestamp, self.template_name)
+        post = Post(meta, post_bucket_proxy, content)
+
+        return post
 
     def save_post(self, post: Post):
         # Update index and save post

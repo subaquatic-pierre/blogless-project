@@ -1,9 +1,6 @@
-from time import time
 import json
 from postmanager.manager import PostManager
 from postmanager.response import Response
-from postmanager.post import Post
-from postmanager.meta import PostMetaData
 
 
 def post(event, context):
@@ -11,7 +8,7 @@ def post(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    post_manager, bucket_proxy = PostManager.setup(
+    post_manager, _ = PostManager.setup(
         "serverless-blog-contents", template_name, f"{template_str}/"
     )
 
@@ -29,19 +26,13 @@ def post(event, context):
     try:
         req_body = json.loads(event.get("body"))
 
-        # get latest post id
-        new_id = post_manager.get_latest_id()
-
-        # get form data
+        # Get data from body
         meta_data = req_body.get("metaData")
         title = meta_data.get("title")
-        timestamp = int(time())
-
         content = req_body.get("content")
 
         # create post
-        meta = PostMetaData(new_id, title, timestamp, template_str)
-        post = Post(meta, bucket_proxy, content)
+        post = post_manager.create_post(title, content)
 
         # save post
         post_manager.save_post(post)

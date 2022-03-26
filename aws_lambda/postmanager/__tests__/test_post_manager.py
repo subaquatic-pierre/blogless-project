@@ -13,7 +13,7 @@ BUCKET_NAME = "serverless-blog-contents"
 BUCKET_ROOT_DIR = "blog/"
 
 
-def create_post(error=False):
+def create_post():
     # Create post
     post_id = 0
     post_title = "Sometitle"
@@ -23,15 +23,13 @@ def create_post(error=False):
     post_bucket_proxy = BucketProxy(
         BUCKET_NAME, f"{BUCKET_NAME,BUCKET_ROOT_DIR}{post_id}"
     )
+
+    post_bucket_proxy = MagicMock()
+
     post_meta = PostMetaData(post_id, post_title, timestamp, post_template)
     post = Post(post_meta, post_bucket_proxy, content)
 
-    # Configure post mocks
-    if error:
-        post.save = MagicMock(side_effect=Exception)
-    else:
-        post.save = MagicMock()
-    post.to_json = MagicMock()
+    post.save = MagicMock()
 
     return post
 
@@ -144,6 +142,14 @@ class TestPostManager(TestCase):
 
         self.assertEqual(str(e.exception), "No blog with that title found")
 
+
+class TestPostManagerWithPost(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.bucket_proxy = MagicMock()
+        self.blog_manager = PostManager("Blog", self.bucket_proxy)
+
     def test_save_post(self):
         post = create_post()
 
@@ -156,7 +162,8 @@ class TestPostManager(TestCase):
         self.assertEqual(post, return_value)
 
     def test_save_post_error(self):
-        post = create_post(error=True)
+        post = create_post()
+        post.save = MagicMock(side_effect=Exception)
 
         self.blog_manager._update_index = MagicMock()
 
@@ -165,6 +172,17 @@ class TestPostManager(TestCase):
 
         self.blog_manager._update_index.assert_not_called()
         self.assertEqual(str(e.exception), "Post could not be saved")
+
+    # def test_save_post_error(self):
+    #     post = create_post(error=True)
+
+    #     self.blog_manager._update_index = MagicMock()
+
+    #     with self.assertRaises(Exception) as e:
+    #         self.blog_manager.save_post(post)
+
+    #     self.blog_manager._update_index.assert_not_called()
+    #     self.assertEqual(str(e.exception), "Post could not be saved")
 
     # def test_save_post(self):
     #     # Post args
