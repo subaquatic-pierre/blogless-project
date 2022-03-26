@@ -1,5 +1,5 @@
 from time import time
-from postmanager.meta import PostMetaData
+from postmanager.meta import PostMeta
 from postmanager.post import Post
 from postmanager.proxy import BucketProxy
 
@@ -34,9 +34,16 @@ class PostManager:
         post_bucket_proxy = BucketProxy(
             self.bucket_proxy.bucket_name, post_dir_bucket_key
         )
-        post_meta = PostMetaData(
-            id, meta[0]["title"], meta[0]["timestamp"], self.template_name
+
+        post_meta = PostMeta.from_json(
+            {
+                "id": id,
+                "title": meta[0]["title"],
+                "timestamp": meta[0]["timestamp"],
+                "template_name": self.template_name,
+            }
         )
+
         post = Post(post_meta, post_bucket_proxy)
         return post
 
@@ -55,8 +62,15 @@ class PostManager:
 
         post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
 
-        meta = PostMetaData(new_id, title, timestamp, template_name)
-        post = Post(meta, post_bucket_proxy, content)
+        post_meta = PostMeta.from_json(
+            {
+                "id": new_id,
+                "title": title,
+                "timestamp": timestamp,
+                "template_name": template_name,
+            }
+        )
+        post = Post(post_meta, post_bucket_proxy, content)
 
         return post
 
