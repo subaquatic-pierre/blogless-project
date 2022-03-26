@@ -1,10 +1,16 @@
 from unittest import TestCase
 import os
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from postmanager.manager import PostManager
+from postmanager.post import Post
+from postmanager.meta import PostMetaData
 from postmanager.proxy import BucketProxy
+
+
+BUCKET_NAME = "serverless-blog-contents"
+BUCKET_ROOT_DIR = "blog/"
 
 
 class TestPostManager(TestCase):
@@ -59,6 +65,98 @@ class TestPostManager(TestCase):
         self.assertIsInstance(json_res, dict)
         self.bucket_proxy.get_json.assert_called_with(filename)
 
+    def test_get_by_id(self):
+        post_id = 0
+        attrs = {
+            "get_json.return_value": [
+                {"id": post_id, "title": "Sometitle", "timestamp": 000}
+            ]
+        }
+        self.bucket_proxy.configure_mock(**attrs)
+
+        post = self.blog_manager.get_by_id(post_id)
+
+        self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
+        self.assertIsInstance(post, Post)
+        self.assertEqual(post.id, post_id)
+
+    def test_get_by_id_error(self):
+        post_id = 0
+        attrs = {
+            "get_json.return_value": [
+                {"id": "noid", "title": "Sometitle", "timestamp": 000}
+            ]
+        }
+        self.bucket_proxy.configure_mock(**attrs)
+        with self.assertRaises(Exception) as e:
+            self.blog_manager.get_by_id(post_id)
+
+        self.assertEqual(str(e.exception), "No blog with that ID found")
+
+    def test_title_to_id(self):
+        post_id = 0
+        post_title = "Sometitle"
+        attrs = {
+            "get_json.return_value": [
+                {"id": post_id, "title": post_title, "timestamp": 000}
+            ]
+        }
+        self.bucket_proxy.configure_mock(**attrs)
+
+        post_id = self.blog_manager.title_to_id(post_title)
+
+        self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
+        self.assertIsInstance(post_id, int)
+
+    def test_title_to_id_error(self):
+        post_id = 0
+        attrs = {
+            "get_json.return_value": [
+                {"id": "noid", "title": "Sometitle", "timestamp": 000}
+            ]
+        }
+        self.bucket_proxy.configure_mock(**attrs)
+        with self.assertRaises(Exception) as e:
+            self.blog_manager.title_to_id(post_id)
+
+        self.assertEqual(str(e.exception), "No blog with that title found")
+
+    def test_save_post(self):
+        # Post args
+        post_id = 0
+        post_title = "Sometitle"
+        timestamp = 000
+        post_template = "Blog"
+        content = "My amazing content"
+
+        bucket_proxy_return_mock_value = []
+        attrs = {"get_json.return_value": bucket_proxy_return_mock_value}
+        self.bucket_proxy.configure_mock(**attrs)
+
+        # Create post
+        post_bucket_proxy = BucketProxy(
+            BUCKET_NAME, f"{BUCKET_NAME,BUCKET_ROOT_DIR}{post_id}"
+        )
+        post_meta = PostMetaData(post_id, post_title, timestamp, post_template)
+        post_meta.to_json = MagicMock()
+        post = Post(post_meta, post_bucket_proxy, content)
+
+        # Configure post mocks
+        post.save = MagicMock()
+        post.to_json = MagicMock()
+        self.blog_manager._update_index = MagicMock()
+
+        return_value = self.blog_manager.save_post(post)
+
+        self.blog_manager.bucket_proxy.get_json.assert_has_calls(
+            [call("index.json"), call("index.json")]
+        )
+
+        self.blog_manager._update_index.assert_called_once()
+        post.save.assert_called_once()
+        post.meta_data.to_json.assert_called_once()
+        self.assertEqual(post, return_value)
+
     # def test_title_to_id_success(self):
     #     post_id = self.blog_manager.title_to_id("Nervous Poincare")
     #     self.assertIsInstance(post_id, int)
@@ -68,26 +166,3 @@ class TestPostManager(TestCase):
     #         self.blog_manager.title_to_id("Nervous")
 
     #     self.assertTrue("No blog with that title found" in str(context.exception))
-
-    def test_create_post(self):
-        index = [
-            {"id": 0, "time_stamp": 1646289628, "title": "Nervous Poincare"},
-            {"id": 1, "time_stamp": 1646289718, "title": "Recursing Hypatia"},
-        ]
-        content = {
-            "time": 1550476186479,
-            "blocks": [
-                {
-                    "type": "paragraph",
-                    "data": {
-                        "text": "The example of text that was written in <b>one of popular</b> text editors."
-                    },
-                },
-                {
-                    "type": "header",
-                    "data": {"text": "With the header of course", "level": 2},
-                },
-                {"type": "paragraph", "data": {"text": "So what do we have?"}},
-            ],
-            "version": "2.8.1",
-        }

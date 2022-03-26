@@ -31,7 +31,7 @@ class PostManager:
 
     def get_by_id(self, id) -> Post:
         meta = [meta_data for meta_data in self.index if meta_data["id"] == id]
-        self._verify_meta(meta)
+        self._verify_meta(meta, "No blog with that ID found")
         post_dir_bucket_key = f"{self.bucket_proxy.root_dir}{id}/"
         post_bucket_proxy = BucketProxy(
             self.bucket_proxy.bucket_name, post_dir_bucket_key
@@ -44,13 +44,13 @@ class PostManager:
 
     def title_to_id(self, title: str) -> int:
         meta = [blog_meta for blog_meta in self.index if blog_meta["title"] == title]
-        self._verify_meta(meta)
+        self._verify_meta(meta, "No blog with that title found")
         return meta[0]["id"]
 
     def save_post(self, post: Post):
         # Update index and save post
         try:
-            index = self.index
+            index = [meta for meta in self.index]
 
             meta_index = None
             for i in range(len(index)):
@@ -94,8 +94,8 @@ class PostManager:
         except Exception:
             self.bucket_proxy.save_json([], "index.json")
 
-    def _verify_meta(self, meta):
+    def _verify_meta(self, meta, error_message):
         if len(meta) > 1:
             raise Exception("More than one blog with that title found")
         elif len(meta) == 0:
-            raise Exception("No blog with that title found")
+            raise Exception(error_message)
