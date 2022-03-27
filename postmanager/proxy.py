@@ -10,12 +10,15 @@ class BucketProxy:
         self.s3_interface = boto3.resource("s3")
 
     def get_json(self, object_key):
-        object = self.s3_interface.Object(
-            self.bucket_name, f"{self.root_dir}{object_key}"
-        )
-        object_res = object.get()
-        object_json = json.loads(object_res["Body"].read())
-        return object_json
+        try:
+            object = self.s3_interface.Object(
+                self.bucket_name, f"{self.root_dir}{object_key}"
+            )
+            object_res = object.get()
+            object_json = json.loads(object_res["Body"].read())
+            return object_json
+        except Exception as e:
+            return {"error": {"message": "File not found"}}
 
     def save_json(self, body: dict, filename: str):
         self.bucket_interface.put_object(Key=self.root_dir)

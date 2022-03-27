@@ -1,7 +1,7 @@
 data "archive_file" "lambda_functions" {
   type = "zip"
 
-  source_dir  = "${path.module}/postmanager"
+  source_dir  = "${path.module}/../../postmanager"
   output_path = "${path.module}/functions.zip"
 }
 

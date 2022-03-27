@@ -42,7 +42,11 @@ def get(event, context):
 
     post_id = int(path.split("/")[-1])
 
-    post = post_manager.get_by_id(post_id)
+    try:
+        post = post_manager.get_by_id(post_id)
+    except Exception:
+        response = Response({"error": {"message": "Blog not found"}})
+        return response.format()
 
     body = post.to_json()
     response = Response(body)
