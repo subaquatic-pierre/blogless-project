@@ -17,7 +17,16 @@ def list(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    # test params
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    bucket_proxy = BucketProxy(
+        bucket_name=BUCKET_NAME,
+        root_dir=f"{template_str}/",
+        test_bucket=testing,
+        mock_config=mock_config,
+    )
     post_manager = PostManager(template_name, bucket_proxy)
 
     if params:
@@ -37,7 +46,15 @@ def get(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    bucket_proxy = BucketProxy(
+        bucket_name=BUCKET_NAME,
+        root_dir=f"{template_str}/",
+        test_bucket=testing,
+        mock_config=mock_config,
+    )
     post_manager = PostManager(template_name, bucket_proxy)
 
     post_id = int(path.split("/")[-1])
@@ -58,7 +75,16 @@ def delete(event, context):
     path = event.get("path")
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
-    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    bucket_proxy = BucketProxy(
+        bucket_name=BUCKET_NAME,
+        root_dir=f"{template_str}/",
+        test_bucket=testing,
+        mock_config=mock_config,
+    )
     post_manager = PostManager(template_name, bucket_proxy)
 
     # get post id
@@ -77,7 +103,15 @@ def post(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    bucket_proxy = BucketProxy(
+        bucket_name=BUCKET_NAME,
+        root_dir=f"{template_str}/",
+        test_bucket=testing,
+        mock_config=mock_config,
+    )
     post_manager = PostManager(template_name, bucket_proxy)
 
     response = Response()
@@ -125,7 +159,15 @@ def put(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    bucket_proxy = BucketProxy(
+        bucket_name=BUCKET_NAME,
+        root_dir=f"{template_str}/",
+        test_bucket=testing,
+        mock_config=mock_config,
+    )
     post_manager = PostManager(template_name, bucket_proxy)
 
     blog_id = path.split("/")[-1]

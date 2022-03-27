@@ -56,18 +56,6 @@ class TestPostManager(TestCase):
         self.assertIsInstance(json_res, dict)
         self.bucket_proxy.get_json.assert_called_with(filename)
 
-    def test_get_by_id(self):
-        post_id = 0
-        self.bucket_proxy.get_json.return_value = [
-            {"id": post_id, "title": "Sometitle", "timestamp": 000}
-        ]
-
-        post = self.blog_manager.get_by_id(post_id)
-
-        self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
-        self.assertIsInstance(post, Post)
-        self.assertEqual(post.id, post_id)
-
     def test_get_by_id_error(self):
         post_id = 0
         self.bucket_proxy.get_json.return_value = [
@@ -110,17 +98,37 @@ class TestPostManagerWithPost(TestCase):
         self.post_title = "Amazing Post"
         self.post_content = {"blocks": "Cool post content"}
 
+    def test_get_by_id(self):
+        post_id = 0
+        self.bucket_proxy.get_json.return_value = [
+            {"id": post_id, "title": "Sometitle", "timestamp": 000}
+        ]
+
+        post = self.blog_manager.get_by_id(post_id)
+
+        self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
+        self.assertIsInstance(post, Post)
+        self.assertEqual(post.id, post_id)
+
+    def test_create_meta_from_json(self):
+        title = "Awesome Title"
+        post_meta = {"title": title}
+        meta = self.blog_manager.create_meta(post_meta)
+
+        self.assertEqual(meta.title, title)
+
     def test_create_post(self):
         post_meta = self.blog_manager.create_meta(self.post_title)
         post = self.blog_manager.create_post(post_meta, self.post_content)
 
-        post_root_dir = f"{self.blog_manager.bucket_proxy.root_dir}{post.id}"
+        post_root_dir = f"{self.blog_manager.bucket_proxy.root_dir}{post.id}/"
 
         post.bucket_proxy.get_json = MagicMock(return_value=self.post_content)
 
         self.assertEqual(post.id, 0)
         self.assertEqual(post.title, self.post_title)
         self.assertEqual(post.content, self.post_content)
+        self.assertTrue(post.bucket_proxy.root_dir.endswith("/"))
         self.assertEqual(post.bucket_proxy.root_dir, post_root_dir)
 
     def test_save_post(self):

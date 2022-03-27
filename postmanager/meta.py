@@ -18,17 +18,22 @@ class PostMeta:
             self._attrs_list.append(key)
 
         for key, value in attrs.items():
-            if key == "id" or "title":
-                pass
-            setattr(self, key, value)
+            if key == "id" or key == "title":
+                continue
+            else:
+                setattr(self, key, value)
 
     @staticmethod
     def from_json(attrs: dict):
-        title = attrs.get("title", False)
-        id = attrs.get("id", False)
+        title = attrs.get("title", None)
+        id = attrs.get("id", None)
 
-        if not title or id:
-            raise Exception("Title and ID must exist on attrs object")
+        if title == None:
+            raise Exception("Title attrs object")
+
+        if id == None:
+            raise Exception("Title attrs object")
 
         post_meta = PostMeta(id, title, attrs)
+
         return post_meta
