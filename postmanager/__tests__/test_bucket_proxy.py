@@ -3,9 +3,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from proxy import BucketProxy
-
-BUCKET_NAME = "serverless-blog-contents"
-BUCKET_ROOT_DIR = "blog/"
+from .utils import BUCKET_NAME, BUCKET_ROOT_DIR
 
 
 class KeyMock:

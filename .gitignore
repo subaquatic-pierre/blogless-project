@@ -1,7 +1,6 @@
 **/node_modules/
 **/.venv/
 **/__pycache__/
-**/test.*
 
 # Infrastrcutre ignore
 infrastructure/.terraform
@@ -16,4 +15,5 @@ infrastructure/**/__tests__/
 
 lambda_functions/blog_template/
 temp/
+postmanager/test_api_methods.py
 response.json

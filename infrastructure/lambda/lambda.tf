@@ -1,9 +1,16 @@
+data "archive_file" "lambda_functions" {
+  type = "zip"
+
+  source_dir  = "${path.module}/postmanager"
+  output_path = "${path.module}/functions.zip"
+}
+
 resource "aws_lambda_function" "list" {
   function_name    = "List"
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = aws_s3_object.lambda_functions.key
   runtime          = "python3.9"
-  handler          = "methods.list"
+  handler          = "api_methods.list"
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
   role             = aws_iam_role.lambda_exec.arn
 }
@@ -13,7 +20,7 @@ resource "aws_lambda_function" "get" {
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = aws_s3_object.lambda_functions.key
   runtime          = "python3.9"
-  handler          = "methods.get"
+  handler          = "api_methods.get"
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
   role             = aws_iam_role.lambda_exec.arn
 }
@@ -23,7 +30,7 @@ resource "aws_lambda_function" "put" {
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = aws_s3_object.lambda_functions.key
   runtime          = "python3.9"
-  handler          = "methods.put"
+  handler          = "api_methods.put"
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
   role             = aws_iam_role.lambda_exec.arn
 }
@@ -33,7 +40,7 @@ resource "aws_lambda_function" "post" {
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = aws_s3_object.lambda_functions.key
   runtime          = "python3.9"
-  handler          = "methods.post"
+  handler          = "api_methods.post"
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
   role             = aws_iam_role.lambda_exec.arn
 }
@@ -43,7 +50,7 @@ resource "aws_lambda_function" "delete" {
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = aws_s3_object.lambda_functions.key
   runtime          = "python3.9"
-  handler          = "methods.delete"
+  handler          = "api_methods.delete"
   source_code_hash = data.archive_file.lambda_functions.output_base64sha256
   role             = aws_iam_role.lambda_exec.arn
 }

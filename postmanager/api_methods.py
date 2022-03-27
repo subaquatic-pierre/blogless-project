@@ -1,8 +1,11 @@
 import json
 from post import Post
 from meta import PostMeta
+from proxy import BucketProxy
 from manager import PostManager
 from response import Response
+
+BUCKET_NAME = "serverless-blog-contents"
 
 
 def list(event, context):
@@ -13,9 +16,9 @@ def list(event, context):
     path = event.get("path")
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
-    post_manager, _ = PostManager.setup(
-        "serverless-blog-contents", template_name, f"{template_str}/"
-    )
+
+    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    post_manager = PostManager(template_name, bucket_proxy)
 
     if params:
         title = params.get("title")
@@ -34,9 +37,9 @@ def get(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    post_manager, _ = PostManager.setup(
-        "serverless-blog-contents", template_name, f"{template_str}/"
-    )
+    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    post_manager = PostManager(template_name, bucket_proxy)
+
     post_id = int(path.split("/")[-1])
 
     post = post_manager.get_by_id(post_id)
@@ -51,9 +54,8 @@ def delete(event, context):
     path = event.get("path")
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
-    post_manager, _ = PostManager.setup(
-        "serverless-blog-contents", template_name, f"{template_str}/"
-    )
+    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    post_manager = PostManager(template_name, bucket_proxy)
 
     # get post id
     post_id = int(path.split("/")[-1])
@@ -71,9 +73,8 @@ def post(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    post_manager, _ = PostManager.setup(
-        "serverless-blog-contents", template_name, f"{template_str}/"
-    )
+    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    post_manager = PostManager(template_name, bucket_proxy)
 
     response = Response()
 
@@ -120,9 +121,8 @@ def put(event, context):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    post_manager, _ = PostManager.setup(
-        "serverless-blog-contents", template_name, f"{template_str}/"
-    )
+    bucket_proxy = BucketProxy(bucket_name=BUCKET_NAME, root_dir=f"{template_str}/")
+    post_manager = PostManager(template_name, bucket_proxy)
 
     blog_id = path.split("/")[-1]
     post = post_manager.get_by_id(int(blog_id))

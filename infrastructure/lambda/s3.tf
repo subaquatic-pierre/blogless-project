@@ -9,13 +9,6 @@ resource "aws_s3_bucket_acl" "lambda_bucket" {
 }
 
 
-data "archive_file" "lambda_functions" {
-  type = "zip"
-
-  source_dir  = "${path.module}/functions"
-  output_path = "${path.module}/functions.zip"
-}
-
 resource "aws_s3_object" "lambda_functions" {
   bucket = aws_s3_bucket.lambda_bucket.id
 

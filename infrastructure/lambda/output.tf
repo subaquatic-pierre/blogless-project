@@ -19,11 +19,6 @@ output "lambda_delete_invoke_arn" {
   value = aws_lambda_function.delete.invoke_arn
 }
 
-output "lambda_title_to_id_invoke_arn" {
-  value = aws_lambda_function.title_to_id.invoke_arn
-}
-
-
 
 
 

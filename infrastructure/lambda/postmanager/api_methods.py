@@ -1,5 +1,8 @@
-from postmanager.manager import PostManager
-from postmanager.response import Response
+import json
+from post import Post
+from meta import PostMeta
+from manager import PostManager
+from response import Response
 
 
 def list(event, context):
@@ -92,7 +95,8 @@ def post(event, context):
         content = req_body.get("content")
 
         # create post
-        post = post_manager.create_post(title, content)
+        post_meta: PostMeta = post_manager.create_meta(title)
+        post: Post = post_manager.create_post(post_meta, content)
 
         # save post
         post_manager.save_post(post)

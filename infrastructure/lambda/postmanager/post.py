@@ -1,6 +1,6 @@
 import json
-from postmanager.proxy import BucketProxy
-from postmanager.meta import PostMeta
+from proxy import BucketProxy
+from meta import PostMeta
 
 
 class Post:

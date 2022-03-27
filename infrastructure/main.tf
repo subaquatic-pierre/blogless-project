@@ -35,13 +35,12 @@ module "api" {
   acm_certificate_arn = module.frontend.acm_certificate_arn
 
   # lambda invoke arns
-  lambda_list_invoke_arn        = module.lambda.lambda_list_invoke_arn
-  lambda_get_invoke_arn         = module.lambda.lambda_get_invoke_arn
-  lambda_put_invoke_arn         = module.lambda.lambda_put_invoke_arn
-  lambda_post_invoke_arn        = module.lambda.lambda_post_invoke_arn
-  lambda_delete_invoke_arn      = module.lambda.lambda_delete_invoke_arn
-  lambda_title_to_id_invoke_arn = module.lambda.lambda_title_to_id_invoke_arn
-  deployed_at                   = timestamp()
+  lambda_list_invoke_arn   = module.lambda.lambda_list_invoke_arn
+  lambda_get_invoke_arn    = module.lambda.lambda_get_invoke_arn
+  lambda_put_invoke_arn    = module.lambda.lambda_put_invoke_arn
+  lambda_post_invoke_arn   = module.lambda.lambda_post_invoke_arn
+  lambda_delete_invoke_arn = module.lambda.lambda_delete_invoke_arn
+  deployed_at              = timestamp()
 }
 
 module "lambda" {

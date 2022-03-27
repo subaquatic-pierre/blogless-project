@@ -8,7 +8,6 @@ variable "lambda_get_invoke_arn" {}
 variable "lambda_put_invoke_arn" {}
 variable "lambda_post_invoke_arn" {}
 variable "lambda_delete_invoke_arn" {}
-variable "lambda_title_to_id_invoke_arn" {}
 
 
 # variable "rest_api_name" {}

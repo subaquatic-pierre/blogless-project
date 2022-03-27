@@ -10,12 +10,6 @@ class PostManager:
         self.template_name = template_name
         self._init_bucket()
 
-    @staticmethod
-    def setup(bucket_name, template_name, bucket_dir):
-        bucket_proxy = BucketProxy(bucket_name, f"{bucket_dir}/")
-        post_manager = PostManager(template_name, bucket_proxy)
-        return post_manager, bucket_proxy
-
     @property
     def index(self):
         obj_json = self.bucket_proxy.get_json("index.json")
@@ -44,7 +38,9 @@ class PostManager:
             }
         )
 
-        post = Post(post_meta, post_bucket_proxy)
+        # content = post_bucket_proxy.get_json('content.json')
+        content = {}
+        post = self.create_post(post_meta, post_bucket_proxy)
         return post
 
     def title_to_id(self, title: str) -> int:

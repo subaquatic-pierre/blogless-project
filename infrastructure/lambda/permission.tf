@@ -6,14 +6,6 @@ resource "aws_lambda_permission" "list" {
   source_arn    = "${var.api_execution_arn}/*/*/*"
 }
 
-resource "aws_lambda_permission" "title_to_id" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.title_to_id.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_execution_arn}/*/*/*"
-}
-
 resource "aws_lambda_permission" "get" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
