@@ -1,7 +1,7 @@
 from time import time
-from postmanager.meta import PostMeta
-from postmanager.post import Post
-from postmanager.proxy import BucketProxy
+from meta import PostMeta
+from post import Post
+from proxy import BucketProxy
 
 
 class PostManager:
@@ -52,15 +52,10 @@ class PostManager:
         self._verify_meta(meta, "No blog with that title found")
         return meta[0]["id"]
 
-    def create_post(self, title, content):
-        # New post args
-        new_id = self._get_latest_id()
+    def create_meta(self, title: str) -> PostMeta:
         template_name = self.template_name
-        bucket_name = self.bucket_proxy.bucket_name
-        post_root_dir = f"{self.bucket_proxy.root_dir}{new_id}"
         timestamp = int(time())
-
-        post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
+        new_id = self._get_latest_id()
 
         post_meta = PostMeta.from_json(
             {
@@ -70,6 +65,15 @@ class PostManager:
                 "template_name": template_name,
             }
         )
+
+        return post_meta
+
+    def create_post(self, post_meta: PostMeta, content) -> Post:
+        # New post args
+        bucket_name = self.bucket_proxy.bucket_name
+        post_root_dir = f"{self.bucket_proxy.root_dir}{post_meta.id}"
+        post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
+
         post = Post(post_meta, post_bucket_proxy, content)
 
         return post
