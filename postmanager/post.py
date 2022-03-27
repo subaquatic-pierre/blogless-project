@@ -23,8 +23,11 @@ class Post:
 
     @property
     def content(self):
-        self._content = self.bucket_proxy.get_json("content.json")
-        return self._content
+        try:
+            self._content = self.bucket_proxy.get_json("content.json")
+            return self._content
+        except Exception:
+            return "No content found"
 
     @content.setter
     def content(self, content):
@@ -32,11 +35,9 @@ class Post:
 
     def save(self):
         # Save content
-        self.bucket_proxy.save_bytes("", "images/")
+        self.bucket_proxy.save_json("images/", "")
         # Save meta
         self.bucket_proxy.save_json(self.meta_data.to_json(), "meta.json")
-
-        self.bucket_proxy.create_dir("images/")
 
         # Save images, for image in images
         if self.image != None:

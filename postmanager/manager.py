@@ -63,11 +63,13 @@ class PostManager:
 
         return post_meta
 
-    def create_post(self, post_meta: PostMeta, content) -> Post:
+    def create_post(self, post_meta: PostMeta, content, test_bucket=False) -> Post:
         # New post args
         bucket_name = self.bucket_proxy.bucket_name
         post_root_dir = f"{self.bucket_proxy.root_dir}{post_meta.id}/"
-        post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
+        post_bucket_proxy = BucketProxy(
+            bucket_name, post_root_dir, test_bucket=test_bucket
+        )
 
         post = Post(post_meta, post_bucket_proxy, content)
 

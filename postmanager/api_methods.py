@@ -120,10 +120,11 @@ def post(event, context):
 
         # create post
         post_meta: PostMeta = post_manager.create_meta(title)
-        post: Post = post_manager.create_post(post_meta, content)
+        post: Post = post_manager.create_post(post_meta, content, test_bucket=testing)
 
         # save post
-        post_manager.save_post(post)
+        if not testing:
+            post_manager.save_post(post)
 
     except Exception as e:
         error_message = f'There was an error parsing metaData or content. Message: {getattr(e, "message", str(e))}'
