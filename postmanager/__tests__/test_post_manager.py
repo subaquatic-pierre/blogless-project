@@ -112,8 +112,7 @@ class TestPostManagerWithPost(TestCase):
 
     def test_create_meta_from_json(self):
         title = "Awesome Title"
-        post_meta = {"title": title}
-        meta = self.blog_manager.create_meta(post_meta)
+        meta = self.blog_manager.create_meta(title)
 
         self.assertEqual(meta.title, title)
 

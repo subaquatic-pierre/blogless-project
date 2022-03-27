@@ -8,18 +8,9 @@ from response import Response
 BUCKET_NAME = "serverless-blog-contents"
 
 
-def list(event, context):
-    params = event.get("queryStringParameters")
-    body = {}
-    response = Response()
-
-    path = event.get("path")
+def setup_post_manager(path, testing, mock_config):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
-
-    # test params
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
 
     bucket_proxy = BucketProxy(
         bucket_name=BUCKET_NAME,
@@ -28,6 +19,31 @@ def list(event, context):
         mock_config=mock_config,
     )
     post_manager = PostManager(template_name, bucket_proxy)
+
+    return post_manager, bucket_proxy
+
+
+def parse_body(event):
+    try:
+        body = json.loads(event.get("body"))
+        return body
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def list(event, context):
+    params = event.get("queryStringParameters")
+    body = {}
+    response = Response()
+
+    path = event.get("path")
+
+    # test params
+    testing = event.get("test_api", False)
+    mock_config = event.get("mock_config", {})
+
+    post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     if params:
         title = params.get("title")
@@ -43,19 +59,11 @@ def list(event, context):
 
 def get(event, context):
     path = event.get("path")
-    template_str = path.split("/")[1]
-    template_name = template_str.capitalize()
 
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    bucket_proxy = BucketProxy(
-        bucket_name=BUCKET_NAME,
-        root_dir=f"{template_str}/",
-        test_bucket=testing,
-        mock_config=mock_config,
-    )
-    post_manager = PostManager(template_name, bucket_proxy)
+    post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     post_id = int(path.split("/")[-1])
 
@@ -73,19 +81,11 @@ def get(event, context):
 
 def delete(event, context):
     path = event.get("path")
-    template_str = path.split("/")[1]
-    template_name = template_str.capitalize()
 
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    bucket_proxy = BucketProxy(
-        bucket_name=BUCKET_NAME,
-        root_dir=f"{template_str}/",
-        test_bucket=testing,
-        mock_config=mock_config,
-    )
-    post_manager = PostManager(template_name, bucket_proxy)
+    post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     # get post id
     post_id = int(path.split("/")[-1])
@@ -106,32 +106,17 @@ def post(event, context):
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    bucket_proxy = BucketProxy(
-        bucket_name=BUCKET_NAME,
-        root_dir=f"{template_str}/",
-        test_bucket=testing,
-        mock_config=mock_config,
-    )
-    post_manager = PostManager(template_name, bucket_proxy)
+    post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     response = Response()
 
     try:
-        req_body = json.loads(event.get("body"))
-    except Exception as e:
-        error_message = (
-            f'There was an error parsing body. Message: {getattr(e, "message", str(e))}'
-        )
-        response.error_message = error_message
-        return response.format()
-
-    try:
-        req_body = json.loads(event.get("body"))
+        body = parse_body(event)
 
         # Get data from body
-        meta_data = req_body.get("metaData")
+        meta_data = body.get("metaData")
         title = meta_data.get("title")
-        content = req_body.get("content")
+        content = body.get("content")
 
         # create post
         post_meta: PostMeta = post_manager.create_meta(title)
@@ -162,13 +147,7 @@ def put(event, context):
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    bucket_proxy = BucketProxy(
-        bucket_name=BUCKET_NAME,
-        root_dir=f"{template_str}/",
-        test_bucket=testing,
-        mock_config=mock_config,
-    )
-    post_manager = PostManager(template_name, bucket_proxy)
+    post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     blog_id = path.split("/")[-1]
     post = post_manager.get_by_id(int(blog_id))
