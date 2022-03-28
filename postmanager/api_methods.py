@@ -8,6 +8,10 @@ from response import Response
 BUCKET_NAME = "serverless-blog-contents"
 
 
+def format_error_message(message, e):
+    return f'{message}. {getattr(e, "message", str(e))}'
+
+
 def setup_post_manager(path, testing, mock_config={}):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
@@ -30,12 +34,8 @@ def setup_post_manager(path, testing, mock_config={}):
 
 
 def parse_body(event):
-    try:
-        body = json.loads(event.get("body"))
-        return body
-
-    except Exception as e:
-        raise Exception(e)
+    body = json.loads(event.get("body"))
+    return body
 
 
 def list(event, context):
@@ -65,7 +65,7 @@ def get(event, context):
 
     post_manager, _ = setup_post_manager(path, testing, mock_config)
 
-    post_id = int(path.split("/")[-1])
+    post_id = path.split("/")[-1]
 
     try:
         post = post_manager.get_by_id(post_id)
@@ -90,7 +90,7 @@ def delete(event, context):
     post_manager, _ = setup_post_manager(path, testing, mock_config)
 
     # get post id
-    post_id = int(path.split("/")[-1])
+    post_id = path.split("/")[-1]
 
     # delete post
     # post_manager.delete_post(post_id)
@@ -104,10 +104,9 @@ def post(event, context):
     path = event.get("path")
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
+    response = Response()
 
     post_manager, _ = setup_post_manager(path, testing, mock_config)
-
-    response = Response()
 
     try:
         body = parse_body(event)
@@ -125,38 +124,63 @@ def post(event, context):
         post_manager.save_post(post)
 
     except Exception as e:
-        error_message = f'There was an error parsing metaData or content. Message: {getattr(e, "message", str(e))}'
+        error_message = format_error_message(
+            "There was an error parsing metaData or content", e
+        )
         response.error_message = error_message
+
+    if response.error_message:
         return response.format()
+    else:
+        body = {
+            "post": post.to_json(),
+        }
+        response.body = body
 
-    body = {
-        "post": post.to_json(),
-    }
-
-    response = Response(body)
-
-    return response.format()
+        return response.format()
 
 
 def put(event, context):
     path = event.get("path")
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
+    post_id = path.split("/")[-1]
 
     post_manager, _ = setup_post_manager(path, testing, mock_config)
+    response = Response()
 
-    blog_id = path.split("/")[-1]
-    post = post_manager.get_by_id(int(blog_id))
+    try:
+        body = parse_body(event)
+    except Exception as e:
+        error_message = format_error_message("There was an error parsing body", e)
+        response.error_message = error_message
 
-    response = Response(event)
-    return response.format()
+    try:
+        meta_data = body.get("metaData")
+        content = body.get("content")
 
-    # get values from form
+        # get post
+        post: Post = post_manager.get_by_id(post_id)
+        post_meta = post_manager.get_meta(post_id)
 
-    # update post
-    response = Response(post.to_json())
+        post.meta_data = post_meta
+        post.content = content
 
-    # save post
-    # post_manager.save_post(post)
+    except Exception as e:
+        error_message = format_error_message("There was an error updating post data", e)
+        response.error_message = error_message
+        return response.format()
 
-    return response.format()
+    try:
+        post_manager.save_post(post)
+
+    except Exception as e:
+        error_message = format_error_message("There was an error saving post", e)
+        response.error_message = error_message
+
+    if response.error_message:
+        return response.format()
+
+    else:
+        response.body = {"post": post.to_json()}
+        return response.format()

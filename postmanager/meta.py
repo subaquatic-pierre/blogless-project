@@ -29,10 +29,10 @@ class PostMeta:
         id = attrs.get("id", None)
 
         if title == None:
-            raise Exception("Title attrs object")
+            raise Exception("attrs object must have 'title' key")
 
         if id == None:
-            raise Exception("Title attrs object")
+            raise Exception("attrs object must have 'id' key")
 
         post_meta = PostMeta(id, title, attrs)
 

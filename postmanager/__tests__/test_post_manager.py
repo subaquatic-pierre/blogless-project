@@ -161,7 +161,7 @@ class TestPostManagerWithPost(TestCase):
             self.blog_manager.save_post(post)
 
         self.blog_manager._update_index.assert_not_called()
-        self.assertEqual(str(e.exception), f"Post could not be saved, Message: ")
+        self.assertEqual(str(e.exception), f"Post could not be saved, ")
 
     def test_delete_post(self):
         post_meta: PostMeta = self.blog_manager.create_meta("Amazing Post")

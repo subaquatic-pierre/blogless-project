@@ -23,6 +23,8 @@ class PostManager:
         return self.bucket_proxy.get_json(filename)
 
     def get_by_id(self, id) -> Post:
+        id = int(id)
+
         meta = [meta_data for meta_data in self.index if meta_data["id"] == id]
         self._verify_meta(meta, "No blog with that ID found")
         post_meta = PostMeta.from_json(
@@ -91,7 +93,7 @@ class PostManager:
             return post
 
         except Exception as e:
-            raise Exception(f"Post could not be saved, Message: {str(e)}")
+            raise Exception(f"Post could not be saved, {str(e)}")
 
     def delete_post(self, id: int):
         post = self.get_by_id(id)
@@ -105,6 +107,18 @@ class PostManager:
         index = self.index
         new_index = [meta for meta in index if meta["id"] != id]
         self._update_index(new_index)
+
+    def get_meta(self, post_id):
+        for meta_index, item in enumerate(self.index):
+            if item["id"] == int(post_id):
+                break
+            else:
+                meta_index = -1
+
+        if meta_index == -1:
+            raise PostManagerException("Meta data not found")
+
+        return PostMeta.from_json(self.index[meta_index])
 
     def _get_post_content(self, post_id):
         return self.bucket_proxy.get_json(f"{post_id}/content.json")
