@@ -57,7 +57,7 @@ class MockBucketProxy(BucketProxyBase):
     def _configure_s3_object(self, object_key):
         class ObjectMock:
             def read(self):
-                return json.dumps({"test": "ok"})
+                return json.dumps({"test": "ok", "object_key": object_key})
 
             def get(self):
                 response = {"Body": self}

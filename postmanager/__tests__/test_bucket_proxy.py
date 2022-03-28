@@ -33,14 +33,9 @@ class BucketProxyTest(TestCase):
 
     def test_get_json(self):
         bucket = MockBucketProxy(BUCKET_NAME, self.bucket.root_dir)
-        # bucket.s3_interface.Object = MagicMock(return_value=ObjectMock)
         object_key = "index.json"
         json = bucket.get_json(object_key)
-
-        # bucket.s3_interface.Object.assert_called_once_with(
-        #     BUCKET_NAME, f"{self.bucket.root_dir}{object_key}"
-        # )
-        # self.assertIn("test", json)
+        self.assertEqual(json["object_key"], object_key)
         self.assertIsInstance(json, dict)
 
     def test_get_json_resource_mock(self):
