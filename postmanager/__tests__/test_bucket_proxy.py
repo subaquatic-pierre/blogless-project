@@ -2,39 +2,13 @@ import json
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from proxy import BucketProxy
+from proxy import BucketProxy, MockBucketProxy
 from .utils import BUCKET_NAME, BUCKET_ROOT_DIR
 
 
 class KeyMock:
     def __init__(self, key) -> None:
         self.key = key
-
-
-class BodyMock:
-    def read(self):
-        return json.dumps({"test": "ok"})
-
-
-class ObjectMock:
-    def __init__(self, bucket_name, object_key) -> None:
-        self.bucket_name = bucket_name
-        self.key = object_key
-
-    def get():
-        response = {"Body": BodyMock()}
-        return response
-
-
-class ResourceMock:
-    class Object:
-        def __init__(self, bucket_name, object_key) -> None:
-            self.bucket_name = bucket_name
-            self.key = object_key
-
-        def get(self):
-            response = {"Body": BodyMock()}
-            return response
 
 
 class BucketInterfaceMock:
@@ -54,12 +28,11 @@ class BucketInterfaceMock:
 class BucketProxyTest(TestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.bucket = BucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR, test_bucket=True)
+        self.bucket = MockBucketProxy(BUCKET_NAME, BUCKET_ROOT_DIR)
         self.bucket.bucket_interface = MagicMock()
-        self.bucket.s3_interface = ResourceMock
 
     def test_get_json(self):
-        bucket = BucketProxy(BUCKET_NAME, self.bucket.root_dir, test_bucket=True)
+        bucket = MockBucketProxy(BUCKET_NAME, self.bucket.root_dir)
         # bucket.s3_interface.Object = MagicMock(return_value=ObjectMock)
         object_key = "index.json"
         json = bucket.get_json(object_key)

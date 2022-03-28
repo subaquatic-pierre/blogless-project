@@ -4,27 +4,28 @@ from unittest.mock import MagicMock
 from manager import PostManager
 from post import Post
 from meta import PostMeta
+from proxy import MockBucketProxy
 
-from .utils import create_dummy_bucket_proxy
+from .utils import BUCKET_NAME, BUCKET_ROOT_DIR
 
 
 class TestPostManager(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.bucket_proxy = create_dummy_bucket_proxy()
-        self.blog_manager = PostManager("Blog", self.bucket_proxy)
+        self.bucket_proxy = MagicMock()
+        self.blog_manager = PostManager(self.bucket_proxy, "Blog")
 
     def test_manager_init_success(self):
         bucket_proxy = MagicMock()
-        blog_manager = PostManager("Blog", bucket_proxy)
+        blog_manager = PostManager(bucket_proxy, "Blog")
 
         blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
 
     def test_manager_init_setup(self):
         bucket_proxy = MagicMock()
         bucket_proxy.get_json.side_effect = Exception("Boom!")
-        blog_manager = PostManager("Blog", bucket_proxy)
+        blog_manager = PostManager(bucket_proxy, "Blog")
 
         blog_manager.bucket_proxy.save_json.assert_called_with([], "index.json")
 
@@ -93,8 +94,8 @@ class TestPostManagerWithPost(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.bucket_proxy = create_dummy_bucket_proxy()
-        self.blog_manager = PostManager("Blog", self.bucket_proxy)
+        self.bucket_proxy = MagicMock()
+        self.blog_manager = PostManager(self.bucket_proxy, "Blog")
         self.post_title = "Amazing Post"
         self.post_content = {"blocks": "Cool post content"}
 
@@ -154,7 +155,7 @@ class TestPostManagerWithPost(TestCase):
             self.blog_manager.save_post(post)
 
         self.blog_manager._update_index.assert_not_called()
-        self.assertEqual(str(e.exception), "Post could not be saved")
+        self.assertEqual(str(e.exception), f"Post could not be saved, Message: ")
 
     def test_delete_post(self):
         post_meta: PostMeta = self.blog_manager.create_meta("Amazing Post")

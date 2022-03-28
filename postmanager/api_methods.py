@@ -1,24 +1,30 @@
 import json
 from post import Post
 from meta import PostMeta
-from proxy import BucketProxy
+from proxy import BucketProxy, MockBucketProxy
 from manager import PostManager
 from response import Response
 
 BUCKET_NAME = "serverless-blog-contents"
 
 
-def setup_post_manager(path, testing, mock_config):
+def setup_post_manager(path, testing, mock_config={}):
     template_str = path.split("/")[1]
     template_name = template_str.capitalize()
 
-    bucket_proxy = BucketProxy(
-        bucket_name=BUCKET_NAME,
-        root_dir=f"{template_str}/",
-        test_bucket=testing,
-        mock_config=mock_config,
-    )
-    post_manager = PostManager(template_name, bucket_proxy)
+    if testing:
+        bucket_proxy = MockBucketProxy(
+            bucket_name=BUCKET_NAME,
+            root_dir=f"{template_str}/",
+            mock_config=mock_config,
+        )
+    else:
+        bucket_proxy = BucketProxy(
+            bucket_name=BUCKET_NAME,
+            root_dir=f"{template_str}/",
+        )
+
+    post_manager = PostManager(bucket_proxy, template_name)
 
     return post_manager, bucket_proxy
 
@@ -34,12 +40,7 @@ def parse_body(event):
 
 def list(event, context):
     params = event.get("queryStringParameters")
-    body = {}
-    response = Response()
-
     path = event.get("path")
-
-    # test params
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
@@ -53,13 +54,12 @@ def list(event, context):
     else:
         body = post_manager.index
 
-    response.body = body
+    response = Response(body)
     return response.format()
 
 
 def get(event, context):
     path = event.get("path")
-
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
@@ -81,7 +81,6 @@ def get(event, context):
 
 def delete(event, context):
     path = event.get("path")
-
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
@@ -100,9 +99,6 @@ def delete(event, context):
 
 def post(event, context):
     path = event.get("path")
-    template_str = path.split("/")[1]
-    template_name = template_str.capitalize()
-
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
@@ -120,11 +116,10 @@ def post(event, context):
 
         # create post
         post_meta: PostMeta = post_manager.create_meta(title)
-        post: Post = post_manager.create_post(post_meta, content, test_bucket=testing)
+        post: Post = post_manager.create_post(post_meta, content)
 
         # save post
-        if not testing:
-            post_manager.save_post(post)
+        post_manager.save_post(post)
 
     except Exception as e:
         error_message = f'There was an error parsing metaData or content. Message: {getattr(e, "message", str(e))}'
@@ -142,9 +137,6 @@ def post(event, context):
 
 def put(event, context):
     path = event.get("path")
-    template_str = path.split("/")[1]
-    template_name = template_str.capitalize()
-
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 

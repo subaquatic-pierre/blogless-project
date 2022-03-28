@@ -1,35 +1,17 @@
+from abc import ABC, abstractmethod
 from unittest.mock import MagicMock
 import json
 import boto3
 
 
-class BucketProxy:
-    def __init__(
-        self, bucket_name, root_dir, test_bucket=False, mock_config={}
-    ) -> None:
+class BucketProxyBase(ABC):
+    def __init__(self, bucket_name, root_dir) -> None:
         self.bucket_name = bucket_name
         self.root_dir = root_dir
-        self.test_bucket = test_bucket
-
-        if test_bucket:
-            self.bucket_interface = MagicMock()
-        else:
-            self.bucket_interface = boto3.resource("s3").Bucket(bucket_name)
-
-    def _configure_s3_object(self, object_key):
-        if self.test_bucket:
-            return MagicMock()
-        else:
-            return boto3.resource("s3").Object(
-                self.bucket_name, f"{self.root_dir}{object_key}"
-            )
 
     def get_json(self, object_key):
         object = self._configure_s3_object(object_key)
         object_res = object.get()
-
-        if self.test_bucket:
-            return {}
 
         object_json = json.loads(object_res["Body"].read())
         return object_json
@@ -60,4 +42,36 @@ class BucketProxy:
         self.bucket_interface.put_object(
             Key=f"{self.root_dir}{filename}",
             Body=body,
+        )
+
+    @abstractmethod
+    def _configure_s3_object(self, *args, **kwargs):
+        pass
+
+
+class MockBucketProxy(BucketProxyBase):
+    def __init__(self, bucket_name, root_dir, mock_config={}) -> None:
+        super().__init__(bucket_name, root_dir)
+        self.bucket_interface = MagicMock()
+
+    def _configure_s3_object(self, object_key):
+        class ObjectMock:
+            def read(self):
+                return json.dumps({"test": "ok"})
+
+            def get(self):
+                response = {"Body": self}
+                return response
+
+        return ObjectMock()
+
+
+class BucketProxy(BucketProxyBase):
+    def __init__(self, bucket_name, root_dir) -> None:
+        super().__init__(bucket_name, root_dir)
+        self.bucket_interface = boto3.resource("s3").Bucket(bucket_name)
+
+    def _configure_s3_object(self, object_key):
+        return boto3.resource("s3").Object(
+            self.bucket_name, f"{self.root_dir}{object_key}"
         )
