@@ -1,11 +1,11 @@
 import json
-from proxy import BucketProxy
+from proxy import BucketProxyBase
 from meta import PostMeta
 
 
 class Post:
     def __init__(
-        self, meta_data: PostMeta, bucket_proxy: BucketProxy, content="", image=None
+        self, bucket_proxy: BucketProxyBase, meta_data: PostMeta, content="", image=None
     ) -> None:
         self.id = meta_data.id
         self.bucket_proxy = bucket_proxy
@@ -23,8 +23,11 @@ class Post:
 
     @property
     def content(self):
-        self._content = self.bucket_proxy.get_json("content.json")
-        return self._content
+        try:
+            self._content = self.bucket_proxy.get_json("content.json")
+            return self._content
+        except Exception:
+            return "No content found"
 
     @content.setter
     def content(self, content):
@@ -32,7 +35,7 @@ class Post:
 
     def save(self):
         # Save content
-        self.bucket_proxy.save_json(self._content, "content.json")
+        self.bucket_proxy.save_json("images/", "")
         # Save meta
         self.bucket_proxy.save_json(self.meta_data.to_json(), "meta.json")
 

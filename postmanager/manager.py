@@ -1,11 +1,11 @@
 from time import time
 from meta import PostMeta
 from post import Post
-from proxy import BucketProxy
+from proxy import BucketProxy, MockBucketProxy, BucketProxyBase
 
 
 class PostManager:
-    def __init__(self, template_name: str, bucket_proxy: BucketProxy) -> None:
+    def __init__(self, bucket_proxy: BucketProxyBase, template_name: str) -> None:
         self.bucket_proxy = bucket_proxy
         self.template_name = template_name
         self._init_bucket()
@@ -25,6 +25,7 @@ class PostManager:
         meta = [meta_data for meta_data in self.index if meta_data["id"] == id]
         self._verify_meta(meta, "No blog with that ID found")
         post_dir_bucket_key = f"{self.bucket_proxy.root_dir}{id}/"
+
         post_bucket_proxy = BucketProxy(
             self.bucket_proxy.bucket_name, post_dir_bucket_key
         )
@@ -38,8 +39,7 @@ class PostManager:
             }
         )
 
-        # content = post_bucket_proxy.get_json('content.json')
-        content = {}
+        # content = post_bucket_proxy.get_json("content.json")
         post = self.create_post(post_meta, post_bucket_proxy)
         return post
 
@@ -66,11 +66,11 @@ class PostManager:
 
     def create_post(self, post_meta: PostMeta, content) -> Post:
         # New post args
-        bucket_name = self.bucket_proxy.bucket_name
-        post_root_dir = f"{self.bucket_proxy.root_dir}{post_meta.id}"
-        post_bucket_proxy = BucketProxy(bucket_name, post_root_dir)
+        post_root_dir = f"{self.bucket_proxy.root_dir}{post_meta.id}/"
 
-        post = Post(post_meta, post_bucket_proxy, content)
+        post_bucket_proxy = self._create_post_bucket_proxy(post_root_dir)
+
+        post = Post(post_bucket_proxy, post_meta, content)
 
         return post
 
@@ -95,8 +95,8 @@ class PostManager:
 
             return post
 
-        except Exception:
-            raise Exception("Post could not be saved")
+        except Exception as e:
+            raise Exception(f"Post could not be saved, Message: {str(e)}")
 
     def delete_post(self, id: int):
         try:
@@ -114,6 +114,14 @@ class PostManager:
 
         except Exception as e:
             raise Exception(e)
+
+    def _create_post_bucket_proxy(self, post_root_dir, mock_config={}):
+        if self.bucket_proxy.__class__.__name__ == "MockBucketProxy":
+            return MockBucketProxy(
+                self.bucket_proxy.bucket_name, post_root_dir, mock_config=mock_config
+            )
+        else:
+            return BucketProxy(self.bucket_proxy.bucket_name, post_root_dir)
 
     def _get_latest_id(self):
         return len(self.index)
