@@ -1,61 +1,23 @@
 import json
 from post import Post
 from meta import PostMeta
-from proxy import BucketProxy, MockBucketProxy
 from manager import PostManager
 from response import Response
-
-BUCKET_NAME = "serverless-blog-contents"
+from method import MethodType, MethodHandler
 
 
 def format_error_message(message, e):
     return f'{message}. {getattr(e, "message", str(e))}'
 
 
-def setup_post_manager(path, testing, mock_config={}):
-    template_str = path.split("/")[1]
-    template_name = template_str.capitalize()
-
-    if testing:
-        bucket_proxy = MockBucketProxy(
-            bucket_name=BUCKET_NAME,
-            root_dir=f"{template_str}/",
-            mock_config=mock_config,
-        )
-    else:
-        bucket_proxy = BucketProxy(
-            bucket_name=BUCKET_NAME,
-            root_dir=f"{template_str}/",
-        )
-
-    post_manager = PostManager(bucket_proxy, template_name)
-
-    return post_manager, bucket_proxy
-
-
-def parse_body(event):
-    body = json.loads(event.get("body"))
-    return body
-
-
 def list(event, context):
-    params = event.get("queryStringParameters")
-    path = event.get("path")
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
 
-    post_manager, _ = setup_post_manager(path, testing, mock_config)
+    post_manager = PostManager.setup_post_manager(event)
+    method_handler = MethodHandler(post_manager, event)
 
-    if params:
-        title = params.get("title")
-        if title:
-            post_id = post_manager.title_to_id("Most Amazing")
-            body = {"id": post_id}
-    else:
-        body = post_manager.index
+    method_handler.handle_method(MethodType.LIST)
 
-    response = Response(body)
-    return response.format()
+    return method_handler.return_response()
 
 
 def get(event, context):
@@ -63,7 +25,7 @@ def get(event, context):
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    post_manager, _ = setup_post_manager(path, testing, mock_config)
+    post_manager = PostManager.setup_post_manager(event)
 
     post_id = path.split("/")[-1]
 
@@ -87,7 +49,7 @@ def delete(event, context):
     testing = event.get("test_api", False)
     mock_config = event.get("mock_config", {})
 
-    post_manager, _ = setup_post_manager(path, testing, mock_config)
+    post_manager = PostManager.setup_post_manager(event)
 
     # get post id
     post_id = path.split("/")[-1]
@@ -106,7 +68,7 @@ def post(event, context):
     mock_config = event.get("mock_config", {})
     response = Response()
 
-    post_manager, _ = setup_post_manager(path, testing, mock_config)
+    post_manager = PostManager.setup_post_manager(event)
 
     try:
         body = parse_body(event)
@@ -146,7 +108,7 @@ def put(event, context):
     mock_config = event.get("mock_config", {})
     post_id = path.split("/")[-1]
 
-    post_manager, _ = setup_post_manager(path, testing, mock_config)
+    post_manager = PostManager.setup_post_manager(event)
     response = Response()
 
     try:

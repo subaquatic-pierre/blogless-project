@@ -3,6 +3,7 @@ from meta import PostMeta
 from post import Post
 from proxy import BucketProxy, MockBucketProxy, BucketProxyBase
 from exception import BucketProxyException, PostManagerException
+from utils import BUCKET_NAME
 
 
 class PostManager:
@@ -120,6 +121,7 @@ class PostManager:
 
         return PostMeta.from_json(self.index[meta_index])
 
+    # Private methods
     def _get_post_content(self, post_id):
         return self.bucket_proxy.get_json(f"{post_id}/content.json")
 
@@ -149,3 +151,27 @@ class PostManager:
             raise PostManagerException("More than one blog with that title found")
         elif len(meta) == 0:
             raise PostManagerException(error_message)
+
+    # Static methods
+    def setup_post_manager(event):
+        path = event.get("path")
+        testing = event.get("test_api", False)
+        mock_config = event.get("mock_config", {})
+        template_str = path.split("/")[1]
+        template_name = template_str.capitalize()
+
+        if testing:
+            bucket_proxy = MockBucketProxy(
+                bucket_name=BUCKET_NAME,
+                root_dir=f"{template_str}/",
+                mock_config=mock_config,
+            )
+        else:
+            bucket_proxy = BucketProxy(
+                bucket_name=BUCKET_NAME,
+                root_dir=f"{template_str}/",
+            )
+
+        post_manager = PostManager(bucket_proxy, template_name)
+
+        return post_manager

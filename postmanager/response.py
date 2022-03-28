@@ -6,6 +6,7 @@ class Response:
         self.status_code = status_code
         self.body = body
         self.error_message = ""
+        self.default_headers = self.get_default_headers()
 
     def get_default_headers(self):
         return {
@@ -14,7 +15,7 @@ class Response:
             "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
         }
 
-    def format(self):
+    def format(self, headers={}):
         if self.error_message:
             return {
                 "isBase64Encoded": False,
@@ -23,10 +24,9 @@ class Response:
                 "body": json.dumps({"error": {"message": self.error_message}}),
             }
 
-        data = {
+        return {
             "isBase64Encoded": False,
             "statusCode": self.status_code,
-            "headers": self.get_default_headers(),
+            "headers": self.default_headers,
             "body": json.dumps(self.body),
         }
-        return data
