@@ -3,9 +3,7 @@ from unittest.mock import MagicMock
 import json
 import boto3
 
-
-class BucketProxyException(Exception):
-    pass
+from exception import BucketProxyException
 
 
 class BucketProxyBase(ABC):

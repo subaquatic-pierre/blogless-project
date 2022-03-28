@@ -35,9 +35,10 @@ class Post:
 
     def save(self):
         # Save content
-        self.bucket_proxy.save_json("images/", "")
+        self.bucket_proxy.save_json("", "images/")
         # Save meta
         self.bucket_proxy.save_json(self.meta_data.to_json(), "meta.json")
+        self.bucket_proxy.save_json(self._content, "content.json")
 
         # Save images, for image in images
         if self.image != None:

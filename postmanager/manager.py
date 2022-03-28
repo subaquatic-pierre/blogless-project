@@ -2,6 +2,7 @@ from time import time
 from meta import PostMeta
 from post import Post
 from proxy import BucketProxy, MockBucketProxy, BucketProxyBase
+from exception import BucketProxyException, PostManagerException
 
 
 class PostManager:
@@ -24,12 +25,6 @@ class PostManager:
     def get_by_id(self, id) -> Post:
         meta = [meta_data for meta_data in self.index if meta_data["id"] == id]
         self._verify_meta(meta, "No blog with that ID found")
-        post_dir_bucket_key = f"{self.bucket_proxy.root_dir}{id}/"
-
-        post_bucket_proxy = BucketProxy(
-            self.bucket_proxy.bucket_name, post_dir_bucket_key
-        )
-
         post_meta = PostMeta.from_json(
             {
                 "id": id,
@@ -39,8 +34,9 @@ class PostManager:
             }
         )
 
-        # content = post_bucket_proxy.get_json("content.json")
-        post = self.create_post(post_meta, post_bucket_proxy)
+        content = self._get_post_content(post_meta.id)
+        post = self.create_post(post_meta, content)
+
         return post
 
     def title_to_id(self, title: str) -> int:
@@ -65,7 +61,6 @@ class PostManager:
         return post_meta
 
     def create_post(self, post_meta: PostMeta, content) -> Post:
-        # New post args
         post_root_dir = f"{self.bucket_proxy.root_dir}{post_meta.id}/"
 
         post_bucket_proxy = self._create_post_bucket_proxy(post_root_dir)
@@ -99,21 +94,20 @@ class PostManager:
             raise Exception(f"Post could not be saved, Message: {str(e)}")
 
     def delete_post(self, id: int):
-        try:
-            post = self.get_by_id(id)
-            post_files = post.list_files()
+        post = self.get_by_id(id)
+        post_files = post.list_files()
 
-            # Add root dir to filenames
-            post_files.append(post.bucket_proxy.root_dir)
-            self.bucket_proxy.delete_files(post_files)
+        # Add root dir to filenames
+        post_files.append(post.bucket_proxy.root_dir)
+        self.bucket_proxy.delete_files(post_files)
 
-            # Update index
-            index = self.index
-            new_index = [meta for meta in index if meta["id"] != id]
-            self._update_index(new_index)
+        # Update index
+        index = self.index
+        new_index = [meta for meta in index if meta["id"] != id]
+        self._update_index(new_index)
 
-        except Exception as e:
-            raise Exception(e)
+    def _get_post_content(self, post_id):
+        return self.bucket_proxy.get_json(f"{post_id}/content.json")
 
     def _create_post_bucket_proxy(self, post_root_dir, mock_config={}):
         if self.bucket_proxy.__class__.__name__ == "MockBucketProxy":
@@ -133,11 +127,11 @@ class PostManager:
         try:
             self.bucket_proxy.get_json("index.json")
 
-        except Exception:
+        except BucketProxyException:
             self.bucket_proxy.save_json([], "index.json")
 
     def _verify_meta(self, meta, error_message):
         if len(meta) > 1:
-            raise Exception("More than one blog with that title found")
+            raise PostManagerException("More than one blog with that title found")
         elif len(meta) == 0:
-            raise Exception(error_message)
+            raise PostManagerException(error_message)

@@ -1,6 +1,6 @@
 import json
 from unittest import TestCase
-from .utils import create_event_and_context
+from utils import create_event_and_context
 from api_methods import get, list, post
 
 

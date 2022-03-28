@@ -73,7 +73,10 @@ def get(event, context):
         response = Response({"error": {"message": "Blog not found"}})
         return response.format()
 
-    body = post.to_json()
+    body = {
+        "post": post.to_json(),
+    }
+
     response = Response(body)
 
     return response.format()
