@@ -18,15 +18,14 @@ def run_api(method_list, post_id=0):
         print_response(get_response)
 
     if "post" in method_list:
-        post_body = json.dumps(
-            {
-                "metaData": {"title": "Awesome First Post"},
-                "content": {
-                    "Heading": "The best first post",
-                    "Paragraph": "Some text to go with the best first post",
-                },
-            }
-        )
+        post_body = {
+            "metaData": {"title": "Living in Life"},
+            "content": {
+                "Heading": "The best first post",
+                "Paragraph": "Some text to go with the best first post",
+            },
+        }
+
         post_event, context = create_event_and_context(
             "/blog", body=post_body, mock_bucket=False
         )
@@ -34,18 +33,16 @@ def run_api(method_list, post_id=0):
         print_response(post_response)
 
     if "put" in method_list:
-        post_body = json.dumps(
-            {
-                "metaData": {"title": "Awesome First Post"},
-                "content": {
-                    "Heading": "The best first post, UPDATED",
-                    "Table": "UPDATED",
-                    "Paragraph": "Some text to go with the best first post",
-                },
-            }
-        )
+        put_body = {
+            "metaData": {"title": "Awesome First Post"},
+            "content": {
+                "Heading": "The best first post, UPDATED",
+                "Table": "UPDATED",
+                "Paragraph": "Some text to go with the best first post",
+            },
+        }
         post_event, context = create_event_and_context(
-            "/blog/0", body=post_body, mock_bucket=False
+            "/blog/0", body=put_body, mock_bucket=False
         )
         post_response = put(post_event, context)
         print_response(post_response)

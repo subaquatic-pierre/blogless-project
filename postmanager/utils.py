@@ -17,7 +17,7 @@ def print_response(response, method=False):
 def create_event_and_context(path, body={}, mock_bucket=True, mock_config={}):
     event = {
         "path": path,
-        "body": body,
+        "body": json.dumps(body),
         "test_api": mock_bucket,
         "mock_config": mock_config,
     }

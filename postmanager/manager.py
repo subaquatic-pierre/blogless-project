@@ -110,16 +110,12 @@ class PostManager:
         self._update_index(new_index)
 
     def get_meta(self, post_id):
-        for meta_index, item in enumerate(self.index):
-            if item["id"] == int(post_id):
-                break
-            else:
-                meta_index = -1
+        for index_meta in self.index:
+            meta = PostMeta.from_json(index_meta)
+            if meta.id == int(post_id):
+                return meta
 
-        if meta_index == -1:
-            raise PostManagerException("Meta data not found")
-
-        return PostMeta.from_json(self.index[meta_index])
+        raise PostManagerException("Meta data not found")
 
     # Private methods
     def _get_post_content(self, post_id):
@@ -153,7 +149,7 @@ class PostManager:
             raise PostManagerException(error_message)
 
     # Static methods
-    def setup_post_manager(event):
+    def setup_api_post_manager(event):
         path = event.get("path")
         testing = event.get("test_api", False)
         mock_config = event.get("mock_config", {})

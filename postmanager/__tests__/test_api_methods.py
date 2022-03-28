@@ -20,6 +20,6 @@ class TestApiMethods(TestCase):
             "metaData": {"title": "Gyming Life"},
             "content": {"Heading": "To be the best you have to be the best"},
         }
-        event, context = create_event_and_context("/blog", json.dumps(post_body))
+        event, context = create_event_and_context("/blog", post_body)
         response = post(event, context)
         return response

@@ -11,8 +11,7 @@ def format_error_message(message, e):
 
 
 def list(event, context):
-
-    post_manager = PostManager.setup_post_manager(event)
+    post_manager = PostManager.setup_api_post_manager(event)
     method_handler = MethodHandler(post_manager, event)
 
     method_handler.handle_method(MethodType.LIST)
@@ -21,27 +20,21 @@ def list(event, context):
 
 
 def get(event, context):
-    path = event.get("path")
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
+    post_manager = PostManager.setup_api_post_manager(event)
+    method_handler = MethodHandler(post_manager, event)
 
-    post_manager = PostManager.setup_post_manager(event)
+    method_handler.handle_method(MethodType.GET)
 
-    post_id = path.split("/")[-1]
+    return method_handler.return_response()
 
-    try:
-        post = post_manager.get_by_id(post_id)
-    except Exception:
-        response = Response({"error": {"message": "Blog not found"}})
-        return response.format()
 
-    body = {
-        "post": post.to_json(),
-    }
+def post(event, context):
+    post_manager = PostManager.setup_api_post_manager(event)
+    method_handler = MethodHandler(post_manager, event)
 
-    response = Response(body)
+    method_handler.handle_method(MethodType.POST)
 
-    return response.format()
+    return method_handler.return_response()
 
 
 def delete(event, context):
@@ -62,87 +55,51 @@ def delete(event, context):
     return response.format()
 
 
-def post(event, context):
-    path = event.get("path")
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
-    response = Response()
-
-    post_manager = PostManager.setup_post_manager(event)
-
-    try:
-        body = parse_body(event)
-
-        # Get data from body
-        meta_data = body.get("metaData")
-        title = meta_data.get("title")
-        content = body.get("content")
-
-        # create post
-        post_meta: PostMeta = post_manager.create_meta(title)
-        post: Post = post_manager.create_post(post_meta, content)
-
-        # save post
-        post_manager.save_post(post)
-
-    except Exception as e:
-        error_message = format_error_message(
-            "There was an error parsing metaData or content", e
-        )
-        response.error_message = error_message
-
-    if response.error_message:
-        return response.format()
-    else:
-        body = {
-            "post": post.to_json(),
-        }
-        response.body = body
-
-        return response.format()
+def put():
+    pass
 
 
-def put(event, context):
-    path = event.get("path")
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
-    post_id = path.split("/")[-1]
+# def put(event, context):
+#     path = event.get("path")
+#     testing = event.get("test_api", False)
+#     mock_config = event.get("mock_config", {})
+#     post_id = path.split("/")[-1]
 
-    post_manager = PostManager.setup_post_manager(event)
-    response = Response()
+#     post_manager = PostManager.setup_post_manager(event)
+#     response = Response()
 
-    try:
-        body = parse_body(event)
-    except Exception as e:
-        error_message = format_error_message("There was an error parsing body", e)
-        response.error_message = error_message
+#     try:
+#         body = parse_body(event)
+#     except Exception as e:
+#         error_message = format_error_message("There was an error parsing body", e)
+#         response.error_message = error_message
 
-    try:
-        meta_data = body.get("metaData")
-        content = body.get("content")
+#     try:
+#         meta_data = body.get("metaData")
+#         content = body.get("content")
 
-        # get post
-        post: Post = post_manager.get_by_id(post_id)
-        post_meta = post_manager.get_meta(post_id)
+#         # get post
+#         post: Post = post_manager.get_by_id(post_id)
+#         post_meta = post_manager.get_meta(post_id)
 
-        post.meta_data = post_meta
-        post.content = content
+#         post.meta_data = post_meta
+#         post.content = content
 
-    except Exception as e:
-        error_message = format_error_message("There was an error updating post data", e)
-        response.error_message = error_message
-        return response.format()
+#     except Exception as e:
+#         error_message = format_error_message("There was an error updating post data", e)
+#         response.error_message = error_message
+#         return response.format()
 
-    try:
-        post_manager.save_post(post)
+#     try:
+#         post_manager.save_post(post)
 
-    except Exception as e:
-        error_message = format_error_message("There was an error saving post", e)
-        response.error_message = error_message
+#     except Exception as e:
+#         error_message = format_error_message("There was an error saving post", e)
+#         response.error_message = error_message
 
-    if response.error_message:
-        return response.format()
+#     if response.error_message:
+#         return response.format()
 
-    else:
-        response.body = {"post": post.to_json()}
-        return response.format()
+#     else:
+#         response.body = {"post": post.to_json()}
+#         return response.format()
