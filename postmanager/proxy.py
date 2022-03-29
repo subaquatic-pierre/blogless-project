@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from unittest.mock import MagicMock
 import json
-from botocore.session import Session
-from botocore.config import Config
+from config import setup_client
+
 
 from exception import BucketProxyException
 
@@ -90,11 +90,4 @@ class MockBucketProxy(BucketProxyBase):
 class BucketProxy(BucketProxyBase):
     def __init__(self, bucket_name, root_dir) -> None:
         super().__init__(bucket_name, root_dir)
-        session = Session()
-        client = session.create_client(
-            "s3",
-            config=Config(
-                connect_timeout=5, read_timeout=60, retries={"max_attempts": 2}
-            ),
-        )
-        self.bucket_interface = client
+        self.bucket_interface = setup_client()
