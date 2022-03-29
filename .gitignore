@@ -12,6 +12,7 @@ infrastructure/terraform.tfstate
 infrastructure/terraform.tfstate.backup
 infrastructure/.terraform.lock.hcl
 infrastructure/**/__tests__/
+.terraform.**
 
 lambda_functions/blog_template/
 temp/
