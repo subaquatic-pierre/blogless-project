@@ -61,10 +61,6 @@ const Create = () => {
     const metaData = values;
     const content = await editorCore.current.save();
 
-    const form = new FormData();
-    form.append("metaData", JSON.stringify(metaData));
-    form.append("content", content);
-
     const body = JSON.stringify({ metaData, content });
 
     const response = await sendPostRequest(body);

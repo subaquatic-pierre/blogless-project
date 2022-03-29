@@ -1,5 +1,7 @@
 import React from "react";
 
+import axios, { AxiosResponse } from "axios";
+
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -8,6 +10,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router";
 
+import useNotificationContext from "hooks/useNotificationContext";
+import { API_DOMAIN_NAME } from "const";
+import parseResponse from "utils/parseResponse";
+
 interface PostCardProps {
   title: string;
   postId: string;
@@ -15,7 +21,32 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ title, imageUrl, postId }) => {
+  const [_, { setWarning, setSuccess }] = useNotificationContext();
+
   const navigate = useNavigate();
+
+  const handleDeleteButtonClick = async () => {
+    const deletePostUrl = `${API_DOMAIN_NAME}/blog/${postId}`;
+
+    try {
+      const res = await axios.delete(deletePostUrl);
+
+      const error = parseResponse(res);
+
+      if (error) {
+        setWarning(error);
+      } else {
+        setSuccess("Post successfully deleted");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+
+      return res;
+    } catch (error) {
+      setWarning(error.message);
+    }
+  };
 
   return (
     <Card>
@@ -40,6 +71,9 @@ const PostCard: React.FC<PostCardProps> = ({ title, imageUrl, postId }) => {
         </Button>
         <Button onClick={() => navigate(`/blog/${postId}/edit`)} size="small">
           Edit
+        </Button>
+        <Button onClick={handleDeleteButtonClick} size="small">
+          Delete
         </Button>
       </CardActions>
     </Card>
