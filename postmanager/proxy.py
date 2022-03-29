@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from unittest.mock import MagicMock
 import json
-import boto3
+from botocore.session import Session
+from botocore.config import Config
 
 from exception import BucketProxyException
 
@@ -11,20 +12,22 @@ class BucketProxyBase(ABC):
         self.bucket_name = bucket_name
         self.root_dir = root_dir
 
-    def get_json(self, object_key):
+    def get_json(self, filename):
         try:
-            object = self._configure_s3_object(object_key)
-            object_res = object.get()
+            object = self.bucket_interface.get_object(
+                Bucket=self.bucket_name, Key=f"{self.root_dir}{filename}"
+            )
 
-            object_json = json.loads(object_res["Body"].read())
+            object_json = json.loads(object["Body"].read())
             return object_json
         except Exception as e:
             raise BucketProxyException(f"Error fething JSON from bucket. {str(e)}")
 
     def save_json(self, body: dict, filename: str):
         try:
-            self.bucket_interface.put_object(Key=self.root_dir)
+            self.bucket_interface.put_object(Bucket=self.bucket_name, Key=self.root_dir)
             self.bucket_interface.put_object(
+                Bucket=self.bucket_name,
                 Key=f"{self.root_dir}{filename}",
                 Body=json.dumps(body),
             )
@@ -35,18 +38,23 @@ class BucketProxyBase(ABC):
         try:
             if len(filenames) > 0:
                 objects = [{"Key": filename} for filename in filenames]
-                self.bucket_interface.delete_objects(Delete={"Objects": objects})
+                self.bucket_interface.delete_objects(
+                    Bucket=self.bucket_name, Delete={"Objects": objects}
+                )
         except Exception as e:
             raise BucketProxyException(f"Error deleting files from bucket. {str(e)}")
 
     def list_dir(self, dir: str = ""):
         try:
-            object_summary_iterator = self.bucket_interface.objects.all()
+            list_response = self.bucket_interface.list_objects_v2(
+                Bucket=self.bucket_name
+            )
+            contents = list_response.get("Contents")
             object_keys = [
-                obj.key
-                for obj in object_summary_iterator
-                if obj.key.startswith(f"{self.root_dir}{dir}")
-                and obj.key != f"{self.root_dir}{dir}"
+                obj["Key"]
+                for obj in contents
+                if obj["Key"].startswith(f"{self.root_dir}{dir}")
+                and obj["Key"] != f"{self.root_dir}{dir}"
             ]
             return object_keys
         except Exception as e:
@@ -61,34 +69,32 @@ class BucketProxyBase(ABC):
         except Exception as e:
             raise BucketProxyException(f"Error saving bytes to bucket. {str(e)}")
 
-    @abstractmethod
-    def _configure_s3_object(self, *args, **kwargs):
-        pass
-
 
 class MockBucketProxy(BucketProxyBase):
     def __init__(self, bucket_name, root_dir, mock_config={}) -> None:
         super().__init__(bucket_name, root_dir)
         self.bucket_interface = MagicMock()
+        mock_attrs = {"get_object.return_value": self.create_object_mock()}
+        self.bucket_interface.configure_mock(**mock_attrs)
 
-    def _configure_s3_object(self, object_key):
-        class ObjectMock:
+    def create_object_mock(self):
+        class StreamingBodyMock:
             def read(self):
-                return json.dumps({"test": "ok", "object_key": object_key})
+                return json.dumps({"test": "ok"})
 
-            def get(self):
-                response = {"Body": self}
-                return response
+        object = {"Body": StreamingBodyMock()}
 
-        return ObjectMock()
+        return object
 
 
 class BucketProxy(BucketProxyBase):
     def __init__(self, bucket_name, root_dir) -> None:
         super().__init__(bucket_name, root_dir)
-        self.bucket_interface = boto3.resource("s3").Bucket(bucket_name)
-
-    def _configure_s3_object(self, object_key):
-        return boto3.resource("s3").Object(
-            self.bucket_name, f"{self.root_dir}{object_key}"
+        session = Session()
+        client = session.create_client(
+            "s3",
+            config=Config(
+                connect_timeout=5, read_timeout=60, retries={"max_attempts": 2}
+            ),
         )
+        self.bucket_interface = client

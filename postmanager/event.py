@@ -14,8 +14,9 @@ class Event:
 
     def _parse_body(self):
         try:
-            body = json.loads(self.event.get("body"))
-            return body
+            body = self.event.get("body")
+            json_body = json.loads(body)
+            return json_body
         except Exception as e:
             self._set_error("There was an error parsing event body", e)
 
@@ -24,7 +25,7 @@ class Event:
             param = self.event.get(param, default)
             return param
         except Exception as e:
-            self._set_error(f"An error occured parsing {param} from event request", e)
+            self._set_error(f"An error occured parsing {param} from request event", e)
 
     def _set_error(self, message, e=""):
         text = f'{message}. {getattr(e, "message", str(e))}'

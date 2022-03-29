@@ -80,9 +80,8 @@ class PostMethod(Method):
             self._set_error("There was an error getting content from request body", e)
             return
 
-        title = meta_data.get("title")
-
         try:
+            title = meta_data.get("title")
             post_meta: PostMeta = self.post_manager.create_meta(title)
             post: Post = self.post_manager.create_post(post_meta, content)
 
