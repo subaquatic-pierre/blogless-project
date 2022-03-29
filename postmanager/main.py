@@ -19,11 +19,8 @@ def run_api(method_list, post_id=0):
 
     if "post" in method_list:
         post_body = {
-            "metaData": {"title": "Living in Life"},
-            "content": {
-                "Heading": "The best first post",
-                "Paragraph": "Some text to go with the best first post",
-            },
+            "metaData": {"title": "Coolest Iceberg"},
+            "content": {"Table": "The iceberg is a table"},
         }
 
         post_event, context = create_event_and_context(
@@ -34,18 +31,21 @@ def run_api(method_list, post_id=0):
 
     if "put" in method_list:
         put_body = {
-            "metaData": {"title": "Awesome First Post"},
-            "content": {
-                "Heading": "The best first post, UPDATED",
-                "Table": "UPDATED",
-                "Paragraph": "Some text to go with the best first post",
-            },
+            "metaData": {"title": "Awesome First Post, UPDATED"},
+            "content": {"Updaet": "The content has been updated"},
         }
         post_event, context = create_event_and_context(
-            "/blog/0", body=put_body, mock_bucket=False
+            f"/blog/{post_id}", body=put_body, mock_bucket=False
         )
         post_response = put(post_event, context)
         print_response(post_response)
+
+    if "delete" in method_list:
+        delete_event, context = create_event_and_context(
+            f"/blog/{post_id}", mock_bucket=False
+        )
+        delete_response = delete(delete_event, context)
+        print_response(delete_response)
 
 
 if __name__ == "__main__":

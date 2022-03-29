@@ -1,6 +1,7 @@
 from time import time
 from meta import PostMeta
 from post import Post
+from event import Event
 from proxy import BucketProxy, MockBucketProxy, BucketProxyBase
 from exception import BucketProxyException, PostManagerException
 from utils import BUCKET_NAME
@@ -149,10 +150,10 @@ class PostManager:
             raise PostManagerException(error_message)
 
     # Static methods
-    def setup_api_post_manager(event):
-        path = event.get("path")
-        testing = event.get("test_api", False)
-        mock_config = event.get("mock_config", {})
+    def setup_api_post_manager(event: Event):
+        path = event.path
+        testing = event.testing
+        mock_config = event.mock_config
         template_str = path.split("/")[1]
         template_name = template_str.capitalize()
 

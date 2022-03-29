@@ -2,10 +2,10 @@ import json
 
 
 class Response:
-    def __init__(self, body={}, status_code=200) -> None:
-        self.status_code = status_code
+    def __init__(self, body={}, error_message="", status_code=200) -> None:
         self.body = body
-        self.error_message = ""
+        self.error_message = error_message
+        self.status_code = status_code
         self.default_headers = self.get_default_headers()
 
     def get_default_headers(self):

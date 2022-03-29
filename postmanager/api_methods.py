@@ -2,8 +2,17 @@ import json
 from post import Post
 from meta import PostMeta
 from manager import PostManager
+from event import Event
 from response import Response
-from method import MethodType, MethodHandler
+from method import (
+    DeleteMethod,
+    MethodType,
+    MethodHandler,
+    GetMethod,
+    ListMethod,
+    PostMethod,
+    PutMethod,
+)
 
 
 def format_error_message(message, e):
@@ -11,95 +20,90 @@ def format_error_message(message, e):
 
 
 def list(event, context):
-    post_manager = PostManager.setup_api_post_manager(event)
-    method_handler = MethodHandler(post_manager, event)
+    request_event = Event(event)
 
-    method_handler.handle_method(MethodType.LIST)
+    if request_event.error_message:
+        response = Response(error_message=request_event.error_message)
+        return response.format()
 
-    return method_handler.return_response()
+    post_manager = PostManager.setup_api_post_manager(request_event)
 
+    method = ListMethod(request_event, post_manager)
 
-def get(event, context):
-    post_manager = PostManager.setup_api_post_manager(event)
-    method_handler = MethodHandler(post_manager, event)
+    method.run()
 
-    method_handler.handle_method(MethodType.GET)
-
-    return method_handler.return_response()
-
-
-def post(event, context):
-    post_manager = PostManager.setup_api_post_manager(event)
-    method_handler = MethodHandler(post_manager, event)
-
-    method_handler.handle_method(MethodType.POST)
-
-    return method_handler.return_response()
-
-
-def delete(event, context):
-    path = event.get("path")
-    testing = event.get("test_api", False)
-    mock_config = event.get("mock_config", {})
-
-    post_manager = PostManager.setup_post_manager(event)
-
-    # get post id
-    post_id = path.split("/")[-1]
-
-    # delete post
-    # post_manager.delete_post(post_id)
-
-    response = Response(post_manager.index)
+    response = Response(method.response_body, method.error_message)
 
     return response.format()
 
 
-def put():
-    pass
+def get(event, context):
+    request_event = Event(event)
+
+    if request_event.error_message:
+        response = Response(error_message=request_event.error_message)
+        return response.format()
+
+    post_manager = PostManager.setup_api_post_manager(request_event)
+
+    method = GetMethod(request_event, post_manager)
+
+    method.run()
+
+    response = Response(method.response_body, method.error_message)
+
+    return response.format()
 
 
-# def put(event, context):
-#     path = event.get("path")
-#     testing = event.get("test_api", False)
-#     mock_config = event.get("mock_config", {})
-#     post_id = path.split("/")[-1]
+def post(event, context):
+    request_event = Event(event)
 
-#     post_manager = PostManager.setup_post_manager(event)
-#     response = Response()
+    if request_event.error_message:
+        response = Response(error_message=request_event.error_message)
+        return response.format()
 
-#     try:
-#         body = parse_body(event)
-#     except Exception as e:
-#         error_message = format_error_message("There was an error parsing body", e)
-#         response.error_message = error_message
+    post_manager = PostManager.setup_api_post_manager(request_event)
 
-#     try:
-#         meta_data = body.get("metaData")
-#         content = body.get("content")
+    method = PostMethod(request_event, post_manager)
 
-#         # get post
-#         post: Post = post_manager.get_by_id(post_id)
-#         post_meta = post_manager.get_meta(post_id)
+    method.run()
 
-#         post.meta_data = post_meta
-#         post.content = content
+    response = Response(method.response_body, method.error_message)
 
-#     except Exception as e:
-#         error_message = format_error_message("There was an error updating post data", e)
-#         response.error_message = error_message
-#         return response.format()
+    return response.format()
 
-#     try:
-#         post_manager.save_post(post)
 
-#     except Exception as e:
-#         error_message = format_error_message("There was an error saving post", e)
-#         response.error_message = error_message
+def delete(event, context):
+    request_event = Event(event)
 
-#     if response.error_message:
-#         return response.format()
+    if request_event.error_message:
+        response = Response(error_message=request_event.error_message)
+        return response.format()
 
-#     else:
-#         response.body = {"post": post.to_json()}
-#         return response.format()
+    post_manager = PostManager.setup_api_post_manager(request_event)
+
+    method = DeleteMethod(request_event, post_manager)
+
+    method.run()
+
+    response = Response(method.response_body, method.error_message)
+
+    return response.format()
+
+
+def put(event, context):
+    request_event = Event(event)
+
+    if request_event.error_message:
+        response = Response(error_message=request_event.error_message)
+        return response.format()
+
+    post_manager = PostManager.setup_api_post_manager(request_event)
+
+    method = PutMethod(request_event, post_manager)
+
+    method.run()
+
+    response = Response(method.response_body, method.error_message)
+
+    return response.format()

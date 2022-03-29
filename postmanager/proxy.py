@@ -19,7 +19,7 @@ class BucketProxyBase(ABC):
             object_json = json.loads(object_res["Body"].read())
             return object_json
         except Exception as e:
-            raise BucketProxyException(f"Error fething JSON from bucket, {str(e)}")
+            raise BucketProxyException(f"Error fething JSON from bucket. {str(e)}")
 
     def save_json(self, body: dict, filename: str):
         try:
@@ -29,7 +29,7 @@ class BucketProxyBase(ABC):
                 Body=json.dumps(body),
             )
         except Exception as e:
-            raise BucketProxyException(f"Error saving JSON to bucket, {str(e)}")
+            raise BucketProxyException(f"Error saving JSON to bucket. {str(e)}")
 
     def delete_files(self, filenames):
         try:
@@ -37,7 +37,7 @@ class BucketProxyBase(ABC):
                 objects = [{"Key": filename} for filename in filenames]
                 self.bucket_interface.delete_objects(Delete={"Objects": objects})
         except Exception as e:
-            raise BucketProxyException(f"Error deleting files from bucket, {str(e)}")
+            raise BucketProxyException(f"Error deleting files from bucket. {str(e)}")
 
     def list_dir(self, dir: str = ""):
         try:
@@ -50,7 +50,7 @@ class BucketProxyBase(ABC):
             ]
             return object_keys
         except Exception as e:
-            raise BucketProxyException(f"Error listing files from bucket, {str(e)}")
+            raise BucketProxyException(f"Error listing files from bucket. {str(e)}")
 
     def save_bytes(self, body: bytes, filename: str):
         try:
@@ -59,7 +59,7 @@ class BucketProxyBase(ABC):
                 Body=body,
             )
         except Exception as e:
-            raise BucketProxyException(f"Error saving bytes to bucket, {str(e)}")
+            raise BucketProxyException(f"Error saving bytes to bucket. {str(e)}")
 
     @abstractmethod
     def _configure_s3_object(self, *args, **kwargs):

@@ -13,6 +13,13 @@ class PostMeta:
 
         return data
 
+    def update_meta(self, attrs):
+        for key, value in attrs.items():
+            # Never update id
+            if key == "id":
+                continue
+            setattr(self, key, value)
+
     def _init_attrs(self, attrs):
         for key in attrs.keys():
             self._attrs_list.append(key)
