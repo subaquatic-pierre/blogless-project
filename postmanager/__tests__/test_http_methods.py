@@ -4,7 +4,7 @@ from utils import create_event_and_context
 from http_methods import get, list, post
 
 
-class TestApiMethods(TestCase):
+class TestHttpMethods(TestCase):
     def test_get_method(self):
         post_id = 0
         event, context = create_event_and_context(f"/blog/{post_id}")
