@@ -1,9 +1,6 @@
 from abc import ABC, abstractmethod
-from enum import Enum, auto
-import json
 from event import Event
 from manager import PostManager
-from response import Response
 from meta import PostMeta
 from post import Post
 
@@ -129,7 +126,6 @@ class PutMethod(Method):
 
             post: Post = self.post_manager.get_by_id(post_id)
 
-            # TODO: Update post_meta
             post_meta = self.post_manager.get_meta(post_id)
 
             post_meta.update_meta(meta_data)
@@ -149,52 +145,3 @@ class PutMethod(Method):
             return
 
         self.response_body = {"post": post.to_json()}
-
-
-class MethodType(Enum):
-    GET = auto()
-    LIST = auto()
-    POST = auto()
-    PUT = auto()
-    DELETE = auto()
-
-
-class MethodHandler:
-    def __init__(self, post_manager, event) -> None:
-        self.post_manager = post_manager
-        self.reponse = Response()
-
-        # parse attrs from event
-        self.request_body = self._parse_body(event)
-        self.query_string_params = self._parse_query_string_params(event)
-        self.path = self._parse_path(event)
-
-    def return_response(self):
-        return self.reponse.format()
-
-    def handle_method(self, method_type: MethodType):
-        if method_type == MethodType.GET:
-            self._handle_get_method()
-        elif method_type == MethodType.LIST:
-            self._handle_list_method()
-        elif method_type == MethodType.POST:
-            self._handle_post_method()
-        elif method_type == MethodType.PUT:
-            self._handle_put_method()
-        elif method_type == MethodType.DELETE:
-            self._handle_delete_method()
-
-    # --- METHOD HANDLERS ---
-    def _handle_get_method(self):
-        pass
-
-    def _handle_list_method(self):
-        pass
-
-    def _handle_put_method(self):
-        pass
-
-    def _handle_delete_method(self):
-        pass
-
-    # --- END METHOD HANDLERS ---

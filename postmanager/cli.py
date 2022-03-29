@@ -1,7 +1,6 @@
 import sys
-import json
 from utils import create_event_and_context, print_response
-from api_methods import get, list, post, put, delete
+from http_method import get, list, post, put, delete
 
 
 def run_api(method_list, post_id=0):
