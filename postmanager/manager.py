@@ -76,21 +76,24 @@ class PostManager:
     def save_post(self, post: Post):
         # Update index and save post
         try:
-            index = [meta for meta in self.index]
+            new_index = [meta for meta in self.index]
 
-            meta_index = None
-            for i in range(len(index)):
-                if index[i]["id"] == post.id:
-                    meta_index = i
+            is_new_post = True
+            for index, meta_json in enumerate(self.index):
+                # Mathing meta found in index
+                meta = PostMeta.from_json(meta_json)
+                if meta.id == post.meta_data.id:
+                    # Set new post flag to false
+                    is_new_post = False
 
-            if meta_index != None:
-                index[i] = post.meta_data.to_json()
+                    # Update meta at index in place
+                    new_index[index] = post.meta_data.to_json()
 
-            else:
-                index.append(post.meta_data.to_json())
+            if is_new_post:
+                new_index.append(post.meta_data.to_json())
 
             post.save()
-            self._update_index(index)
+            self._update_index(new_index)
 
             return post
 
@@ -98,6 +101,7 @@ class PostManager:
             raise Exception(f"Post could not be saved, {str(e)}")
 
     def delete_post(self, id: int):
+        id = int(id)
         post = self.get_by_id(id)
         post_files = post.list_files()
 
@@ -106,8 +110,7 @@ class PostManager:
         self.bucket_proxy.delete_files(post_files)
 
         # Update index
-        index = self.index
-        new_index = [meta for meta in index if meta["id"] != id]
+        new_index = [meta for meta in self.index if meta["id"] != id]
         self._update_index(new_index)
 
     def get_meta(self, post_id):
@@ -145,7 +148,7 @@ class PostManager:
 
     def _verify_meta(self, meta, error_message):
         if len(meta) > 1:
-            raise PostManagerException("More than one blog with that title found")
+            raise PostManagerException("More than one blog with that ID found")
         elif len(meta) == 0:
             raise PostManagerException(error_message)
 

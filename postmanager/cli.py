@@ -1,6 +1,6 @@
 import sys
 from utils import create_event_and_context, print_response
-from http_method import get, list, post, put, delete
+from http_methods import get, list, post, put, delete
 
 
 def run_api(method_list, post_id=0):
@@ -30,8 +30,8 @@ def run_api(method_list, post_id=0):
 
     if "put" in method_list:
         put_body = {
-            "metaData": {"title": "Awesome First Post, UPDATED"},
-            "content": {"Updaet": "The content has been updated"},
+            "metaData": {"title": "Coolest Iceberg, UPDATED"},
+            "content": {"Update": "The content has been updated"},
         }
         post_event, context = create_event_and_context(
             f"/blog/{post_id}", body=put_body, mock_bucket=False

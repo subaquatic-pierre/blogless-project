@@ -1,7 +1,7 @@
 import json
 from unittest import TestCase
 from utils import create_event_and_context
-from api_methods import get, list, post
+from http_methods import get, list, post
 
 
 class TestApiMethods(TestCase):
