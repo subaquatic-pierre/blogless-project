@@ -1,12 +1,12 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from manager import PostManager
 from post import Post
 from meta import PostMeta
-from proxy import MockBucketProxy
+from exception import BucketProxyException
 
-from .utils import BUCKET_NAME, BUCKET_ROOT_DIR
+from utils import BUCKET_NAME, BUCKET_ROOT_DIR
 
 
 class TestPostManager(TestCase):
@@ -24,7 +24,7 @@ class TestPostManager(TestCase):
 
     def test_manager_init_setup(self):
         bucket_proxy = MagicMock()
-        bucket_proxy.get_json.side_effect = Exception("Boom!")
+        bucket_proxy.get_json.side_effect = BucketProxyException()
         blog_manager = PostManager(bucket_proxy, "Blog")
 
         blog_manager.bucket_proxy.save_json.assert_called_with([], "index.json")
@@ -107,7 +107,13 @@ class TestPostManagerWithPost(TestCase):
 
         post = self.blog_manager.get_by_id(post_id)
 
-        self.blog_manager.bucket_proxy.get_json.assert_called_with("index.json")
+        get_json_call_list = self.blog_manager.bucket_proxy.get_json.call_args_list
+        exptected_calls = [
+            call("index.json"),
+            call("index.json"),
+            call("0/content.json"),
+        ]
+        self.assertEqual(get_json_call_list, exptected_calls)
         self.assertIsInstance(post, Post)
         self.assertEqual(post.id, post_id)
 
@@ -155,7 +161,7 @@ class TestPostManagerWithPost(TestCase):
             self.blog_manager.save_post(post)
 
         self.blog_manager._update_index.assert_not_called()
-        self.assertEqual(str(e.exception), f"Post could not be saved, Message: ")
+        self.assertEqual(str(e.exception), f"Post could not be saved, ")
 
     def test_delete_post(self):
         post_meta: PostMeta = self.blog_manager.create_meta("Amazing Post")

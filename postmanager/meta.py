@@ -13,6 +13,13 @@ class PostMeta:
 
         return data
 
+    def update_meta(self, attrs):
+        for key, value in attrs.items():
+            # Never update id
+            if key == "id":
+                continue
+            setattr(self, key, value)
+
     def _init_attrs(self, attrs):
         for key in attrs.keys():
             self._attrs_list.append(key)
@@ -29,10 +36,10 @@ class PostMeta:
         id = attrs.get("id", None)
 
         if title == None:
-            raise Exception("Title attrs object")
+            raise Exception("attrs object must have 'title' key")
 
         if id == None:
-            raise Exception("Title attrs object")
+            raise Exception("attrs object must have 'id' key")
 
         post_meta = PostMeta(id, title, attrs)
 
