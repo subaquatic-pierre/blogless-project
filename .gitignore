@@ -16,5 +16,5 @@ infrastructure/**/__tests__/
 
 lambda_functions/blog_template/
 temp/
-postmanager/test_api_methods.py
+**/handlers
 response.json
