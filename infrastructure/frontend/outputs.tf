@@ -1,17 +1,25 @@
-output "bucket_main" {
-  value = aws_s3_bucket.main
+output "main_bucket_name" {
+  description = "Main name for static hosting bucket"
+
+  value = aws_s3_bucket.main.id
+}
+output "main_bucket_domain_name" {
+  description = "Domain name for redirect bucket"
+
+  value = aws_s3_bucket.main.bucket_domain_name
 }
 
-output "cf_distribution_id_main" {
-  value = aws_cloudfront_distribution.main.id
+output "redirect_bucket_domain_name" {
+  description = "Domain name for main bucket"
+
+  value = aws_s3_bucket.redirect.bucket_domain_name
 }
 
-output "acm_certificate_domain_name" {
-  description = "Domain name for acm certificate"
-  value       = aws_acm_certificate.main.domain_name
+output "main_bucket_website_config_website_endpoint" {
+  value = aws_s3_bucket_website_configuration.main.website_endpoint
 }
 
-output "acm_certificate_arn" {
-  description = "ARN fro ACM certificate"
-  value       = aws_acm_certificate.main.arn
+output "redirect_bucket_website_config_website_endpoint" {
+  value = aws_s3_bucket_website_configuration.redirect.website_endpoint
 }
+

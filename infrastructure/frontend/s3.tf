@@ -14,7 +14,7 @@ resource "aws_s3_bucket_website_configuration" "main" {
   }
 
   error_document {
-    key = "error.html"
+    key = "/index.html"
   }
 
 }
@@ -23,19 +23,19 @@ resource "aws_s3_bucket_website_configuration" "main" {
 # S3 bucket for redirection
 # --------------------
 
-# resource "aws_s3_bucket" "redirect" {
-#   bucket = "www.${var.domain_name}"
-# force_destroy = true
-# }
+resource "aws_s3_bucket" "redirect" {
+  bucket        = "www.${var.domain_name}"
+  force_destroy = true
+}
 
-# resource "aws_s3_bucket_website_configuration" "redirect" {
-#   bucket = aws_s3_bucket.redirect.bucket
+resource "aws_s3_bucket_website_configuration" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
 
-#   redirect_all_requests_to {
-#     host_name = var.domain_name
-#     protocol  = "https"
-#   }
-# }
+  redirect_all_requests_to {
+    host_name = var.domain_name
+    protocol  = "https"
+  }
+}
 
 
 resource "aws_s3_bucket_policy" "main" {
@@ -62,6 +62,3 @@ resource "aws_s3_bucket_policy" "main" {
 }
 POLICY
 }
-
-# "AWS": "${aws_cloudfront_origin_access_identity.main.iam_arn}"
-# "AWS": "origin-access-identity/cloudfront/ABCDEFG1234567"
