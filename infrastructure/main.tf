@@ -57,7 +57,7 @@ module "content" {
 module "frontend" {
   source       = "./frontend"
   tags         = var.tags
-  ssl_cert_arn = var.ssl_cert_arn
+  # ssl_cert_arn = var.ssl_cert_arn
   domain_name  = var.domain_name
 }
 

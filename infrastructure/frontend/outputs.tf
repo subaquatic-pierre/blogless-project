@@ -23,3 +23,9 @@ output "redirect_bucket_website_config_website_endpoint" {
   value = aws_s3_bucket_website_configuration.redirect.website_endpoint
 }
 
+output "acm_certificate_arn" {
+  value = aws_acm_certificate.main.arn
+}
+
+
+

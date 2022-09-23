@@ -1,0 +1,16 @@
+# ------
+# General 
+# ------
+tags = {
+  "Name"        = "serverless-blog",
+  "Project"     = "serverless-blog"
+  "Environment" = "production"
+}
+
+# ------
+# Domain 
+# ------
+domain_name  = "yourdomain.com"
+
+
+
